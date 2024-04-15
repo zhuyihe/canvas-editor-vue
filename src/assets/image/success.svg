@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="29px" height="29px" viewBox="0 0 29 29" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53.2 (72643) - https://sketchapp.com -->
+    <title>chenggong</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="8.05757738e-17 0 29 0 29 29 8.05757738e-17 29"></polygon>
+    </defs>
+    <g id="dianzibignli" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="病历书写--（新）" transform="translate(-679.000000, -641.000000)">
+            <g id="组件2-copy-13" transform="translate(660.000000, 622.000000)">
+                <g id="chenggong" transform="translate(19.000000, 19.000000)">
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <g id="Clip-2"></g>
+                    <path d="M11.8071421,20.7143869 L6.21429836,15.3285295 L7.87146347,13.6714705 L11.8071421,17.6071492 L21.1286781,8.28579014 L22.7857016,9.73568571 L11.8071421,20.7143869 Z M14.5000885,0 C6.4214617,0 0,6.4214617 0,14.5000885 C0,22.5785737 6.4214617,29 14.5000885,29 C22.5785737,29 29,22.5785737 29,14.5000885 C29,6.4214617 22.5785737,0 14.5000885,0 Z" id="Fill-1" fill="#67CA2C" mask="url(#mask-2)"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

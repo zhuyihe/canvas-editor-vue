@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="13px" height="14px" viewBox="0 0 13 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53.2 (72643) - https://sketchapp.com -->
+    <title>gongjuicon_tianchongyanse copy</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="4.81615065e-17 0 13 0 13 14 4.81615065e-17 14"></polygon>
+    </defs>
+    <g id="dianzibignli" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="gongjuicon_tianchongyanse-copy">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <g id="Clip-2"></g>
+            <path d="M0,14 L13,14 L13,11.8783063 L0,11.8783063 L0,14 Z M6.2901458,10.8505802 L11.2497762,5.99386396 L11.2260571,5.97063699 L11.2294425,5.96732181 L5.45735175,0 L4.67017634,0.729318612 L5.65876354,1.75205127 L1.33045192,5.99386396 L6.2901458,10.8505802 Z M6.2901458,2.63724544 L9.17620175,5.46341463 L3.40402638,5.46341463 L6.2901458,2.63724544 Z M10.2916579,8.86317192 C10.2916579,9.25434229 10.6133581,9.57096259 11.0127963,9.57096259 C11.4122556,9.57096259 11.7356062,9.25434229 11.7356062,8.86317192 C11.7356062,8.15538125 11.0144678,7.44920673 11.0144678,7.44920673 C11.0144678,7.44920673 10.2916579,8.15538125 10.2916579,8.86317192 Z" id="Fill-1" fill="#000000" mask="url(#mask-2)"></path>
+        </g>
+    </g>
+</svg>

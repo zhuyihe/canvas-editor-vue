@@ -2,22 +2,29 @@
   "compilerOptions": {
     "target": "es5",
     "module": "esnext",
-    "strict": true,
     "jsx": "preserve",
     "importHelpers": true,
+    "downlevelIteration": true,
     "moduleResolution": "node",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
     "baseUrl": ".",
+    "strict": true,
     "types": [
-      "webpack-env"
+      "webpack-env",
     ],
     "paths": {
       "@/*": [
         "src/*"
-      ]
+      ],
     },
     "lib": [
       "esnext",
@@ -27,13 +34,17 @@
     ]
   },
   "include": [
+    "./src/",
+    "./src/canvasEditor/",
+    "src/types.d.ts",
     "src/**/*.ts",
+    "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
+
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "./src/libs"
   ]
 }
