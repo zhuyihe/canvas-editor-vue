@@ -1,13 +1,13 @@
 <template>
     <div class="splitContent">
         <div class=""><span class="splitspoan">分割前：</span><div class="beforePageing"></div></div>
-        <div class="after"><span class="splitspoan">分割后：</span><div class="pageingContainer"></div></div>
+        <!-- <div class="after"><span class="splitspoan">分割后：</span><div class="pageingContainer"></div></div> -->
     </div>
    
 </template>
 
 <script>
-import splitAndRenderHtml from './utils/calcText'
+import splitHTMLString from './utils/calcText'
 import {htmlText} from './utils/const' 
 export default {
     data(){
@@ -22,7 +22,7 @@ export default {
     },
     methods:{
         init(){
-            splitAndRenderHtml(htmlText)
+           console.log( splitHTMLString(htmlText,100),'json')
             this.getBeforePageing()
         },
         getBeforePageing(){

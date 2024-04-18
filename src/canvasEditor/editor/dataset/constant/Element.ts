@@ -1,6 +1,7 @@
 import { ElementType } from '../enum/Element'
 import { IElement } from '../../interface/Element'
 import { ITd } from '../../interface/table/Td'
+import { IControlStyle } from '../../interface/Control'
 
 export const EDITOR_ELEMENT_STYLE_ATTR: Array<keyof IElement> = [
   'bold',
@@ -69,7 +70,8 @@ export const EDITOR_ELEMENT_ZIP_ATTR: Array<keyof IElement> = [
   'conceptId',
   'imgDisplay',
   'imgFloatPosition',
-  'textDecoration'
+  'textDecoration',
+  'extension'
 ]
 
 export const TABLE_TD_ZIP_ATTR: Array<keyof ITd> = [
@@ -97,6 +99,16 @@ export const CONTROL_CONTEXT_ATTR: Array<keyof IElement> = [
   'control',
   'controlId',
   'controlComponent'
+]
+
+export const CONTROL_STYLE_ATTR: Array<keyof IControlStyle> = [
+  'font',
+  'size',
+  'bold',
+  'color',
+  'highlight',
+  'italic',
+  'strikeout'
 ]
 
 export const EDITOR_ELEMENT_CONTEXT_ATTR: Array<keyof IElement> = [
