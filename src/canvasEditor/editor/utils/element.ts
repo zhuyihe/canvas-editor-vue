@@ -243,6 +243,7 @@ export function formatElementList(
       const prefixStrList = splitText(prefix || controlOption.prefix)
       for (let p = 0; p < prefixStrList.length; p++) {
         const value = prefixStrList[p]
+        
         elementList.splice(i, 0, {
           ...thePrePostfixArg,
           controlId,
@@ -253,6 +254,7 @@ export function formatElementList(
         })
         i++
       }
+     
       // 值
       if (
         (value && value.length) ||

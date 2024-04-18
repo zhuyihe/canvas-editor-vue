@@ -40,6 +40,7 @@ export class CursorAgent {
   }
 
   private _keyDown(evt: KeyboardEvent) {
+    console.log(evt,'evt')
     this.canvasEvent.keydown(evt)
   }
 

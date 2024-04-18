@@ -177,9 +177,8 @@ export class Draw {
     this.options = options
     this.elementList = data.main
     this.listener = listener
-    this.eventBus = eventBus
+    this.eventBus = eventBus 
     this.override = override
-
     this._formatContainer()
     this.pageContainer = this._createPageContainer()
     this._createPage(0)

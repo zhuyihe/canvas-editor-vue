@@ -57,6 +57,7 @@ export function input(data: string, host: CanvasEvent) {
     }
     return newElement
   })
+ 
   // 控件-移除placeholder
   const control = draw.getControl()
   let curIndex: number

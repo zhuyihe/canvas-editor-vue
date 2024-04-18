@@ -87,6 +87,7 @@ export class TextControl implements IControlInstance {
       // 移除空白占位符
       this.control.removePlaceholder(startIndex, context)
     }
+   
     // 非文本类元素或前缀过渡掉样式属性
     const startElement = elementList[startIndex]
     const anchorElement =
@@ -96,11 +97,12 @@ export class TextControl implements IControlInstance {
         ? pickObject(startElement, [
             'control',
             'controlId',
-            ...CONTROL_STYLE_ATTR
+            ...CONTROL_STYLE_ATTR,
           ])
         : omitObject(startElement, ['type'])
     // 插入起始位置
     const start = range.startIndex + 1
+    
     for (let i = 0; i < data.length; i++) {
       const newElement: IElement = {
         ...anchorElement,

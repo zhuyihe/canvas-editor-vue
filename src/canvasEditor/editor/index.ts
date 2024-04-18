@@ -111,6 +111,7 @@ export default class Editor {
       ...defaultControlOption,
       ...options.control
     }
+
     const checkboxOptions: Required<ICheckboxOption> = {
       ...defaultCheckboxOption,
       ...options.checkbox
