@@ -93,6 +93,9 @@ export interface IControlElement {
 export interface ICheckboxElement {
   checkbox?: ICheckbox
 }
+export interface IRadioElement {
+  radio?: ICheckbox
+}
 
 export interface ILaTexElement {
   laTexSVG?: string
@@ -124,6 +127,7 @@ export type IElement = IElementBasic &
   ISeparator &
   IControlElement &
   ICheckboxElement &
+  IRadioElement &
   ILaTexElement &
   IDateElement &
   IImageElement &

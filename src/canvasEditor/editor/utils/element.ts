@@ -255,10 +255,11 @@ export function formatElementList(
       if (
         (value && value.length) ||
         type === ControlType.CHECKBOX ||
-        (type === ControlType.SELECT && code && (!value || !value.length))
+        (type === ControlType.SELECT && code && (!value || !value.length))||
+        type === ControlType.RADIO
       ) {
         let valueList: IElement[] = value || []
-        if (type === ControlType.CHECKBOX) {
+        if ([ControlType.CHECKBOX,ControlType.RADIO].includes(type)) {
           const codeList = code ? code.split(',') : []
           if (Array.isArray(valueSets) && valueSets.length) {
             // 拆分valueList优先使用其属性
@@ -278,8 +279,8 @@ export function formatElementList(
                 value: '',
                 type: el.type,
                 control: el.control,
-                controlComponent: ControlComponent.CHECKBOX,
-                checkbox: {
+                controlComponent:type === ControlType.CHECKBOX? ControlComponent.CHECKBOX:ControlComponent.RADIO,
+                [type]: {
                   code: valueSet.code,
                   value: codeList.includes(valueSet.code)
                 }

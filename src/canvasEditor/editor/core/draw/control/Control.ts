@@ -32,6 +32,7 @@ import { Listener } from '../../listener/Listener'
 import { RangeManager } from '../../range/RangeManager'
 import { Draw } from '../Draw'
 import { CheckboxControl } from './checkbox/CheckboxControl'
+import { RadioControl } from './radio/RadioControl'
 import { ControlSearch } from './interactive/ControlSearch'
 import { ControlBorder } from './richtext/Border'
 import { SelectControl } from './select/SelectControl'
@@ -236,6 +237,8 @@ export class Control {
       selectControl.awake()
     } else if (control.type === ControlType.CHECKBOX) {
       this.activeControl = new CheckboxControl(element, this)
+    }else if (control.type === ControlType.RADIO) {
+      this.activeControl = new RadioControl(element, this)
     }
     // 激活控件回调
     nextTick(() => {
@@ -629,6 +632,10 @@ export class Control {
           const checkbox = new CheckboxControl(element, this)
           const codes = value?.split(',') || []
           checkbox.setSelect(codes, controlContext, controlRule)
+        }else if (type === ControlType.RADIO) {
+          const radio = new RadioControl(element, this)
+          const codes = value?.split(',') || []
+          radio.setSelect(codes, controlContext, controlRule)
         }
         // 修改后控件结束索引
         let newEndIndex = i

@@ -22,11 +22,14 @@ export default {
         case 'text':
           this.resevtInput(eleInfo)
           break
+        case 'checkbox' || 'radio':
+          this.resevtCheckbox(eleInfo)
+          break
       }
       // this.resevtDataBase(eleInfo.inputType,eleInfo)
     },
     resevtInput(eleInfo) {
-      console.log(eleInfo.inputPrompt, ' eleInfo.inputPrompt')
+      
       const control = {
         type: 'control',
         value: '',
@@ -42,6 +45,34 @@ export default {
         }
       }
       this.handleEvents('executeInsertElementList', [control])
+    },
+    resevtCheckbox(eleInfo) {
+      console.log(eleInfo, ' eleInfo.inputPrompt')
+      const valueSets=eleInfo.items.map(item=>{
+        return {
+          code:item.optionCode,
+          value:item.value
+        }
+      })
+      const control = [
+        { value:`${eleInfo.alias|| eleInfo.elementName}:`},
+        {
+          type: 'control',
+          value: '',
+          control: {
+            conceptId: '1',
+            code:'',
+            type: 'radio'||eleInfo.inputType,
+            prefix:' ',
+            postfix:" ",
+            value:'',
+            valueSets,
+            disabled: eleInfo.readonly == 'true' ? true : false,
+            eleInfo
+          }
+        }
+      ]
+      this.handleEvents('executeInsertElementList', [...control])
     }
   }
 }

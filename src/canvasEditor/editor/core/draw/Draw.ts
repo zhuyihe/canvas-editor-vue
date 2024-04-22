@@ -1,4 +1,4 @@
-import { version } from '../../../../package.json'
+import { version } from '../../../../../package.json'
 import { ZERO } from '../../dataset/constant/Common'
 import { RowFlex } from '../../dataset/enum/Row'
 import {
@@ -65,6 +65,7 @@ import {
 import { Control } from './control/Control'
 import { getSlimCloneElementList, zipElementList } from '../../utils/element'
 import { CheckboxParticle } from './particle/CheckboxParticle'
+import { RadioParticle } from './particle/RadioParticle'
 import { DeepRequired, IPadding } from '../../interface/Common'
 import {
   ControlComponent,
@@ -141,6 +142,7 @@ export class Draw {
   private superscriptParticle: SuperscriptParticle
   private subscriptParticle: SubscriptParticle
   private checkboxParticle: CheckboxParticle
+  private radioParticle: RadioParticle
   private blockParticle: BlockParticle
   private listParticle: ListParticle
   private control: Control
@@ -214,6 +216,7 @@ export class Draw {
     this.superscriptParticle = new SuperscriptParticle()
     this.subscriptParticle = new SubscriptParticle()
     this.checkboxParticle = new CheckboxParticle(this)
+    this.radioParticle = new RadioParticle(this)
     this.blockParticle = new BlockParticle(this)
     this.listParticle = new ListParticle(this)
     this.control = new Control(this)
@@ -556,6 +559,7 @@ export class Draw {
   }
 
   public insertElementList(payload: IElement[]) {
+    console.log(payload,'payload')
     if (!payload.length || !this.range.getIsCanInput()) return
     const { startIndex, endIndex } = this.range.getRange()
     if (!~startIndex && !~endIndex) return
@@ -740,6 +744,10 @@ export class Draw {
 
   public getCheckboxParticle(): CheckboxParticle {
     return this.checkboxParticle
+  }
+
+  public getRadioParticle(): RadioParticle {
+    return this.radioParticle
   }
 
   public getControl(): Control {
@@ -1408,12 +1416,22 @@ export class Draw {
         element.type === ElementType.CHECKBOX ||
         element.controlComponent === ControlComponent.CHECKBOX
       ) {
-        const { width, height, gap } = this.options.checkbox
+        console.log('radio',element)
+        const { width, height, gap } = this.options.radio
         const elementWidth = width + gap * 2
         element.width = elementWidth
         metrics.width = elementWidth * scale
         metrics.height = height * scale
-      } else if (element.type === ElementType.TAB) {
+      }else if( 
+        element.type === ElementType.RADIO ||
+        element.controlComponent === ControlComponent.RADIO
+        ){
+          const { width, height, gap } = this.options.radio
+        const elementWidth = width + gap * 2
+        element.width = elementWidth
+        metrics.width = elementWidth * scale
+        metrics.height = height * scale
+        } else if (element.type === ElementType.TAB) {
         metrics.width = defaultTabWidth * scale
         metrics.height = defaultSize * scale
         metrics.boundingBoxDescent = 0
@@ -1781,6 +1799,13 @@ export class Draw {
         ) {
           this.textParticle.complete()
           this.checkboxParticle.render(ctx, element, x, y + offsetY)
+        }else if (
+          element.type === ElementType.RADIO ||
+          element.controlComponent === ControlComponent.RADIO
+        ) {
+          console.log('RADIO')
+          this.textParticle.complete()
+          this.radioParticle.render(ctx, element, x, y + offsetY)
         } else if (element.type === ElementType.TAB) {
           this.textParticle.complete()
         } else if (element.rowFlex === RowFlex.ALIGNMENT) {
