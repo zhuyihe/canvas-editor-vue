@@ -10,7 +10,7 @@ export default {
     methods:{
         watchBus(){
             this.$bus.$on('rangeStyleChange',val=>{
-              console.log('rangeStyleChange',val)
+              // console.log('rangeStyleChange',val)
               if(val.size) this.fontSize=val.size+''
               
             })

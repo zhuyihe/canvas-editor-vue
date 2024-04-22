@@ -59,7 +59,19 @@ export default {
               rowFlex: RowFlex.CENTER
             }
           ],
-          main: []
+          main: [{
+          type: 'control',
+          value: '',
+          control: {
+            conceptId: '1',
+            code:'1',
+            type: 'radio',
+            prefix:' ',
+            postfix:" ",
+            value:'',
+            valueSets:[{value:'11',code:'1'},{value:'22',code:'22'}],
+          }
+        }]
         },
         this.editorOptions
       )

@@ -77,6 +77,7 @@ export interface IEditorOption {
   watermark?: IWatermark
   control?: IControlOption
   checkbox?: ICheckboxOption
+  radio?:ICheckboxOption
   cursor?: ICursorOption
   title?: ITitleOption
   placeholder?: IPlaceholder
