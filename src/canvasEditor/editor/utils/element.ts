@@ -366,7 +366,7 @@ export function formatElementList(
               }
             }
           }
-        } else if([ControlType.MUTISELECT].includes(type)){
+        } else if(type === ControlType.MUTISELECT){
           if (!value || !value.length) {
             const codeList = code ? code.split(',') : []
             if (Array.isArray(valueSets) && valueSets.length) {
