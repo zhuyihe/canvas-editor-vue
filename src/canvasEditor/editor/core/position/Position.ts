@@ -121,10 +121,11 @@ export class Position {
     for (let i = 0; i < rowList.length; i++) {
       const curRow = rowList[i]
       // 计算行偏移量（行居中、居右）
+      const curRowWidth = curRow.width + (curRow.offsetX || 0)
       if (curRow.rowFlex === RowFlex.CENTER) {
-        x += (innerWidth - curRow.width) / 2
+        x += (innerWidth - curRowWidth) / 2
       } else if (curRow.rowFlex === RowFlex.RIGHT) {
-        x += innerWidth - curRow.width
+        x += innerWidth - curRowWidth
       }
       // 当前行X轴偏移量
       x += curRow.offsetX || 0
@@ -393,6 +394,9 @@ export class Position {
                     tdValueElement.type === ElementType.CHECKBOX ||
                     tdValueElement.controlComponent ===
                       ControlComponent.CHECKBOX,
+                  isRadio:
+                    tdValueElement.type === ElementType.RADIO ||
+                    tdValueElement.controlComponent === ControlComponent.RADIO,
                   isControl: !!tdValueElement.controlId,
                   isImage: tablePosition.isImage,
                   isDirectHit: tablePosition.isDirectHit,
@@ -428,6 +432,16 @@ export class Position {
             index: curPositionIndex,
             isDirectHit: true,
             isCheckbox: true
+          }
+        }
+        if (
+          element.type === ElementType.RADIO ||
+          element.controlComponent === ControlComponent.RADIO
+        ) {
+          return {
+            index: curPositionIndex,
+            isDirectHit: true,
+            isRadio: true
           }
         }
         let hitLineStartIndex: number | undefined
@@ -650,6 +664,7 @@ export class Position {
     const {
       index,
       isCheckbox,
+      isRadio,
       isControl,
       isTable,
       trIndex,
@@ -662,6 +677,7 @@ export class Position {
     this.setPositionContext({
       isTable: isTable || false,
       isCheckbox: isCheckbox || false,
+      isRadio: isRadio || false,
       isControl: isControl || false,
       index,
       trIndex,
