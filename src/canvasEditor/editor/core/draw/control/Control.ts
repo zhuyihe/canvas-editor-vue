@@ -653,6 +653,7 @@ export class Control {
         }else if (type === ControlType.MUTISELECT) {
           const select = new MutiselectControl(element, this)
           const codes = value?.split(',') || []
+          console.log(codes,'codes')
           select.setSelect(codes, controlContext, controlRule)
         }
         // 修改后控件结束索引

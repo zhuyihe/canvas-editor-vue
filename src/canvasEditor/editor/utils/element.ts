@@ -267,6 +267,7 @@ export function formatElementList(
         (value && value.length) ||
         type === ControlType.CHECKBOX ||
         type === ControlType.RADIO ||
+        type === ControlType.MUTISELECT ||
         (type === ControlType.SELECT && code && (!value || !value.length))
       ) {
         let valueList: IElement[] = value || []
@@ -324,50 +325,32 @@ export function formatElementList(
               }
             }
           }
-        } else if (type === ControlType.RADIO) {
-          if (Array.isArray(valueSets) && valueSets.length) {
-            // 拆分valueList优先使用其属性
-            const valueStyleList = valueList.reduce(
-              (pre, cur) =>
-                pre.concat(
-                  cur.value.split('').map(v => ({ ...cur, value: v }))
-                ),
-              [] as IElement[]
-            )
-            let valueStyleIndex = 0
-            for (let v = 0; v < valueSets.length; v++) {
-              const valueSet = valueSets[v]
-              // radio组件
-              elementList.splice(i, 0, {
-                ...controlContext,
-                controlId,
-                value: '',
-                type: el.type,
-                control: el.control,
-                controlComponent: ControlComponent.RADIO,
-                radio: {
-                  code: valueSet.code,
-                  value: code === valueSet.code
-                }
-              })
-              i++
-              // 文本
-              const valueStrList = splitText(valueSet.value)
-              for (let e = 0; e < valueStrList.length; e++) {
-                const value = valueStrList[e]
-                const isLastLetter = e === valueStrList.length - 1
-                elementList.splice(i, 0, {
-                  ...controlContext,
-                  ...controlDefaultStyle,
-                  ...valueStyleList[valueStyleIndex],
-                  controlId,
-                  value: value === '\n' ? ZERO : value,
-                  letterSpacing: isLastLetter ? radioOption.gap : 0,
-                  control: el.control,
-                  controlComponent: ControlComponent.VALUE
+        } else if([ControlType.MUTISELECT].includes(type)){
+          if (!value || !value.length) {
+            const codeList = code ? code.split(',') : []
+            if (Array.isArray(valueSets) && valueSets.length) {
+              const valueSet = valueSets.filter(v => codeList.includes(v.code))
+              if (valueSet.length) {
+                valueList=valueSet.map(item=>{return {value:`${item.value}，`}})
+                formatElementList(valueList, {
+                  ...options,
+                  isHandleFirstElement: false
                 })
-                valueStyleIndex++
-                i++
+                valueList.pop()
+                for (let v = 0; v < valueList.length; v++) {
+                  const element = valueList[v]
+                  const value = element.value
+                  elementList.splice(i, 0, {
+                    ...controlDefaultStyle,
+                    ...element,
+                    controlId,
+                    value: value === '\n' ? ZERO : value,
+                    type: element.type || ElementType.TEXT,
+                    control: el.control,
+                    controlComponent: ControlComponent.VALUE
+                  })
+                  i++
+                }
               }
             }
           }
