@@ -61,6 +61,7 @@ export function input(data: string, host: CanvasEvent) {
   // 控件-移除placeholder
   const control = draw.getControl()
   let curIndex: number
+  console.log(control.getActiveControl(),control.getIsRangeWithinControl(),control.getActiveControl() && control.getIsRangeWithinControl(),'2121')
   if (control.getActiveControl() && control.getIsRangeWithinControl()) {
     curIndex = control.setValue(inputData)
   } else {

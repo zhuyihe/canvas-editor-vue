@@ -1,6 +1,7 @@
 export enum ControlType {
   TEXT = 'text',
   SELECT = 'select',
+  MUTISELECT = 'mutiselect',
   CHECKBOX = 'checkbox',
   RADIO = 'radio'
 }

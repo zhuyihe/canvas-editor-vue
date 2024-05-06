@@ -72,6 +72,7 @@ export function formatElementList(
     isHandleFirstElement: true,
     ...options
   }
+  console.log(elementList,'elementList')
   const startElement = elementList[0]
   // 非首字符零宽节点文本元素则补偿-列表元素内部会补偿此处忽略
   if (
@@ -258,7 +259,8 @@ export function formatElementList(
         (value && value.length) ||
         type === ControlType.CHECKBOX ||
         (type === ControlType.SELECT && code && (!value || !value.length))||
-        type === ControlType.RADIO
+        type === ControlType.RADIO||
+        type === ControlType.MUTISELECT
       ) {
         let valueList: IElement[] = value || []
         if ([ControlType.CHECKBOX,ControlType.RADIO].includes(type)) {
@@ -275,13 +277,19 @@ export function formatElementList(
             let valueStyleIndex = 0
             for (let v = 0; v < valueSets.length; v++) {
               const valueSet = valueSets[v]
+              let controlCom:ControlComponent
+              if(type === ControlType.CHECKBOX){
+                controlCom=ControlComponent.CHECKBOX
+              }else  {
+                controlCom=ControlComponent.RADIO
+              }
               // checkbox组件
               elementList.splice(i, 0, {
                 controlId,
                 value: '',
                 type: el.type,
                 control: el.control,
-                controlComponent:type === ControlType.CHECKBOX? ControlComponent.CHECKBOX:ControlComponent.RADIO,
+                controlComponent:controlCom,
                 [type]: {
                   code: valueSet.code,
                   value: codeList.includes(valueSet.code)
@@ -304,6 +312,35 @@ export function formatElementList(
                 })
                 valueStyleIndex++
                 i++
+              }
+            }
+          }
+        }else if([ControlType.MUTISELECT].includes(type)){
+          if (!value || !value.length) {
+            const codeList = code ? code.split(',') : []
+            if (Array.isArray(valueSets) && valueSets.length) {
+              const valueSet = valueSets.filter(v => codeList.includes(v.code))
+              if (valueSet.length) {
+                valueList=valueSet.map(item=>{return {value:`${item.value}，`}})
+                formatElementList(valueList, {
+                  ...options,
+                  isHandleFirstElement: false
+                })
+                valueList.pop()
+                for (let v = 0; v < valueList.length; v++) {
+                  const element = valueList[v]
+                  const value = element.value
+                  elementList.splice(i, 0, {
+                    ...controlDefaultStyle,
+                    ...element,
+                    controlId,
+                    value: value === '\n' ? ZERO : value,
+                    type: element.type || ElementType.TEXT,
+                    control: el.control,
+                    controlComponent: ControlComponent.VALUE
+                  })
+                  i++
+                }
               }
             }
           }

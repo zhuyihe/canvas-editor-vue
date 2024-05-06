@@ -566,7 +566,6 @@ export class Draw {
   }
 
   public insertElementList(payload: IElement[]) {
-    console.log(payload,'payload')
     if (!payload.length || !this.range.getIsCanInput()) return
     const { startIndex, endIndex } = this.range.getRange()
     if (!~startIndex && !~endIndex) return
@@ -1424,7 +1423,6 @@ export class Draw {
         element.type === ElementType.CHECKBOX ||
         element.controlComponent === ControlComponent.CHECKBOX
       ) {
-        console.log('radio',element)
         const { width, height, gap } = this.options.radio
         const elementWidth = width + gap * 2
         element.width = elementWidth
@@ -1822,7 +1820,6 @@ export class Draw {
           element.type === ElementType.RADIO ||
           element.controlComponent === ControlComponent.RADIO
         ) {
-          console.log('RADIO')
           this.textParticle.complete()
           this.radioParticle.render(ctx, element, x, y + offsetY)
         } else if (element.type === ElementType.TAB) {
@@ -2194,6 +2191,7 @@ export class Draw {
   }
 
   public render(payload?: IDrawOption) {
+    console.log(payload,'payload')
     const { header, footer } = this.options
     const {
       isSubmitHistory = true,

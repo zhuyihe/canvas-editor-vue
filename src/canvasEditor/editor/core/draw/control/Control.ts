@@ -37,6 +37,7 @@ import { ControlSearch } from './interactive/ControlSearch'
 import { ControlBorder } from './richtext/Border'
 import { SelectControl } from './select/SelectControl'
 import { TextControl } from './text/TextControl'
+import { MutiselectControl } from './muselect/MutiselectControl'
 
 interface IMoveCursorResult {
   newIndex: number
@@ -217,9 +218,13 @@ export class Control {
     const range = this.getRange()
     const element = elementList[range.startIndex]
     // 判断控件是否已经激活
+    
     if (this.activeControl) {
       // 列举控件唤醒下拉弹窗
       if (this.activeControl instanceof SelectControl) {
+        this.activeControl.awake()
+      }
+      if (this.activeControl instanceof MutiselectControl) {
         this.activeControl.awake()
       }
       const controlElement = this.activeControl.getElement()
@@ -239,6 +244,10 @@ export class Control {
       this.activeControl = new CheckboxControl(element, this)
     }else if (control.type === ControlType.RADIO) {
       this.activeControl = new RadioControl(element, this)
+    } else if (control.type === ControlType.MUTISELECT) {
+      const selectControl = new MutiselectControl(element, this)
+      this.activeControl = selectControl
+      selectControl.awake()
     }
     // 激活控件回调
     nextTick(() => {
@@ -265,6 +274,9 @@ export class Control {
   public destroyControl() {
     if (this.activeControl) {
       if (this.activeControl instanceof SelectControl) {
+        this.activeControl.destroy()
+      }
+      if (this.activeControl instanceof MutiselectControl) {
         this.activeControl.destroy()
       }
       this.activeControl = null
@@ -525,7 +537,8 @@ export class Control {
           })
         } else if (
           type === ControlType.SELECT ||
-          type === ControlType.CHECKBOX
+          type === ControlType.CHECKBOX||
+          type === ControlType.MUTISELECT
         ) {
           const innerText = code
             ?.split(',')
@@ -636,6 +649,10 @@ export class Control {
           const radio = new RadioControl(element, this)
           const codes = value?.split(',') || []
           radio.setSelect(codes, controlContext, controlRule)
+        }else if (type === ControlType.MUTISELECT) {
+          const select = new MutiselectControl(element, this)
+          const codes = value?.split(',') || []
+          select.setSelect(codes, controlContext, controlRule)
         }
         // 修改后控件结束索引
         let newEndIndex = i

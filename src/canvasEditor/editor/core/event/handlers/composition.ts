@@ -6,6 +6,7 @@ function compositionstart(host: CanvasEvent) {
 }
 
 function compositionend(host: CanvasEvent, evt: CompositionEvent) {
+
   host.isComposing = false
   // 处理输入框关闭
   const draw = host.getDraw()

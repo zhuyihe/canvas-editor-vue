@@ -64,12 +64,39 @@ export default {
           value: '',
           control: {
             conceptId: '1',
-            code:'1',
-            type: 'radio',
-            prefix:' ',
-            postfix:" ",
-            value:'',
-            valueSets:[{value:'11',code:'1'},{value:'22',code:'22'}],
+            code:'11,22',
+            placeholder:"请填写",
+            type: 'mutiselect',
+            // prefix:' ',
+            // postfix:" ",
+            value:[],
+            valueSets:[{value:'11',code:'11'},{value:'22',code:'22'}],
+          }
+        },{
+          type: 'control',
+          value: '',
+          control: {
+            conceptId: '1',
+            code:null,
+            placeholder:"请填写",
+            type: 'text',
+            // prefix:' ',
+            // postfix:" ",
+            value:[],
+            
+          }
+        },{
+          type: 'control',
+          value: '',
+          control: {
+            conceptId: '1',
+            code:'',
+            placeholder:"请填写",
+            type: 'select',
+            // prefix:' ',
+            // postfix:" ",
+            value:[],
+            valueSets:[{value:'11',code:'11'},{value:'22',code:'22'}],
           }
         }]
         },
