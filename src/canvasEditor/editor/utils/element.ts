@@ -271,7 +271,7 @@ export function formatElementList(
         (type === ControlType.SELECT && code && (!value || !value.length))
       ) {
         let valueList: IElement[] = value || []
-        if ([ControlType.CHECKBOX,ControlType.RADIO].includes(type)) {
+        if (type === ControlType.CHECKBOX) {
           const codeList = code ? code.split(',') : []
           if (Array.isArray(valueSets) && valueSets.length) {
             // 拆分valueList优先使用其属性
@@ -285,12 +285,6 @@ export function formatElementList(
             let valueStyleIndex = 0
             for (let v = 0; v < valueSets.length; v++) {
               const valueSet = valueSets[v]
-              let controlCom:ControlComponent
-              if(type === ControlType.CHECKBOX){
-                controlCom=ControlComponent.CHECKBOX
-              }else  {
-                controlCom=ControlComponent.RADIO
-              }
               // checkbox组件
               elementList.splice(i, 0, {
                 ...controlContext,
@@ -298,8 +292,8 @@ export function formatElementList(
                 value: '',
                 type: el.type,
                 control: el.control,
-                controlComponent:controlCom,
-                [type]: {
+                controlComponent: ControlComponent.CHECKBOX,
+                checkbox: {
                   code: valueSet.code,
                   value: codeList.includes(valueSet.code)
                 }
@@ -317,6 +311,53 @@ export function formatElementList(
                   controlId,
                   value: value === '\n' ? ZERO : value,
                   letterSpacing: isLastLetter ? checkboxOption.gap : 0,
+                  control: el.control,
+                  controlComponent: ControlComponent.VALUE
+                })
+                valueStyleIndex++
+                i++
+              }
+            }
+          }
+        } else if (type === ControlType.RADIO) {
+          if (Array.isArray(valueSets) && valueSets.length) {
+            // 拆分valueList优先使用其属性
+            const valueStyleList = valueList.reduce(
+              (pre, cur) =>
+                pre.concat(
+                  cur.value.split('').map(v => ({ ...cur, value: v }))
+                ),
+              [] as IElement[]
+            )
+            let valueStyleIndex = 0
+            for (let v = 0; v < valueSets.length; v++) {
+              const valueSet = valueSets[v]
+              // radio组件
+              elementList.splice(i, 0, {
+                ...controlContext,
+                controlId,
+                value: '',
+                type: el.type,
+                control: el.control,
+                controlComponent: ControlComponent.RADIO,
+                radio: {
+                  code: valueSet.code,
+                  value: code === valueSet.code
+                }
+              })
+              i++
+              // 文本
+              const valueStrList = splitText(valueSet.value)
+              for (let e = 0; e < valueStrList.length; e++) {
+                const value = valueStrList[e]
+                const isLastLetter = e === valueStrList.length - 1
+                elementList.splice(i, 0, {
+                  ...controlContext,
+                  ...controlDefaultStyle,
+                  ...valueStyleList[valueStyleIndex],
+                  controlId,
+                  value: value === '\n' ? ZERO : value,
+                  letterSpacing: isLastLetter ? radioOption.gap : 0,
                   control: el.control,
                   controlComponent: ControlComponent.VALUE
                 })
