@@ -121,10 +121,11 @@ export class Position {
     for (let i = 0; i < rowList.length; i++) {
       const curRow = rowList[i]
       // 计算行偏移量（行居中、居右）
+      const curRowWidth = curRow.width + (curRow.offsetX || 0)
       if (curRow.rowFlex === RowFlex.CENTER) {
-        x += (innerWidth - curRow.width) / 2
+        x += (innerWidth - curRowWidth) / 2
       } else if (curRow.rowFlex === RowFlex.RIGHT) {
-        x += innerWidth - curRow.width
+        x += innerWidth - curRowWidth
       }
       // 当前行X轴偏移量
       x += curRow.offsetX || 0
@@ -436,8 +437,7 @@ export class Position {
         if (
           element.type === ElementType.RADIO ||
           element.controlComponent === ControlComponent.RADIO
-        )
-        {
+        ) {
           return {
             index: curPositionIndex,
             isDirectHit: true,
@@ -677,7 +677,7 @@ export class Position {
     this.setPositionContext({
       isTable: isTable || false,
       isCheckbox: isCheckbox || false,
-      isRadio:isRadio || false,
+      isRadio: isRadio || false,
       isControl: isControl || false,
       index,
       trIndex,

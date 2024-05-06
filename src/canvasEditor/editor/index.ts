@@ -80,6 +80,8 @@ import { BackgroundRepeat, BackgroundSize } from './dataset/enum/Background'
 import { TextDecorationStyle } from './dataset/enum/Text'
 import { ILineBreakOption } from './interface/LineBreak'
 import { defaultLineBreak } from './dataset/constant/LineBreak'
+import { ISeparatorOption } from './interface/Separator'
+import { defaultSeparatorOption } from './dataset/constant/Separator'
 
 export default class Editor {
   public command: Command
@@ -156,6 +158,10 @@ export default class Editor {
       ...defaultLineBreak,
       ...options.lineBreak
     }
+    const separatorOptions: Required<ISeparatorOption> = {
+      ...defaultSeparatorOption,
+      ...options.separator
+    }
 
     const editorOptions: DeepRequired<IEditorOption> = {
       mode: EditorMode.EDIT,
@@ -207,7 +213,7 @@ export default class Editor {
       watermark: waterMarkOptions,
       control: controlOptions,
       checkbox: checkboxOptions,
-      radio:radioOptions,
+      radio: radioOptions,
       cursor: cursorOptions,
       title: titleOptions,
       placeholder: placeholderOptions,
@@ -215,7 +221,8 @@ export default class Editor {
       pageBreak: pageBreakOptions,
       zone: zoneOptions,
       background: backgroundOptions,
-      lineBreak: lineBreakOptions
+      lineBreak: lineBreakOptions,
+      separator: separatorOptions
     }
     // 数据处理
     data = deepClone(data)

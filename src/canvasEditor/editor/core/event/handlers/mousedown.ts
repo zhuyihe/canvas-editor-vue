@@ -83,7 +83,6 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
     const isSetCheckbox = isDirectHitCheckbox && !isReadonly
     // 单选框
     const isSetRadio = isDirectHitRadio && !isReadonly
-
     if (isSetCheckbox) {
       const { checkbox, control } = curElement
       // 复选框不在控件内独立控制
@@ -104,12 +103,25 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
           activeControl.setSelect(codes)
         }
       }
+    } else if (isSetRadio) {
+      const { control, radio } = curElement
+      // 单选框不在控件内独立控制
+      if (!control) {
+        draw.getRadioParticle().setSelect(curElement)
+      } else {
+        const codes = radio?.code ? [radio.code] : []
+        const activeControl = draw.getControl().getActiveControl()
+        if (activeControl instanceof RadioControl) {
+          activeControl.setSelect(codes)
+        }
+      }
     } else {
       draw.render({
         curIndex,
         isCompute: false,
         isSubmitHistory: false,
-        isSetCursor: !isDirectHitImage && !isDirectHitCheckbox
+        isSetCursor:
+          !isDirectHitImage && !isDirectHitCheckbox && !isDirectHitRadio
       })
     }
     if (isSetRadio) {

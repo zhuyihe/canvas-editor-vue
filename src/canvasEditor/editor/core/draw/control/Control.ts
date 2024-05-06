@@ -237,7 +237,7 @@ export class Control {
       selectControl.awake()
     } else if (control.type === ControlType.CHECKBOX) {
       this.activeControl = new CheckboxControl(element, this)
-    }else if (control.type === ControlType.RADIO) {
+    } else if (control.type === ControlType.RADIO) {
       this.activeControl = new RadioControl(element, this)
     }
     // 激活控件回调
@@ -525,7 +525,8 @@ export class Control {
           })
         } else if (
           type === ControlType.SELECT ||
-          type === ControlType.CHECKBOX
+          type === ControlType.CHECKBOX ||
+          type === ControlType.RADIO
         ) {
           const innerText = code
             ?.split(',')
@@ -632,9 +633,9 @@ export class Control {
           const checkbox = new CheckboxControl(element, this)
           const codes = value?.split(',') || []
           checkbox.setSelect(codes, controlContext, controlRule)
-        }else if (type === ControlType.RADIO) {
+        } else if (type === ControlType.RADIO) {
           const radio = new RadioControl(element, this)
-          const codes = value?.split(',') || []
+          const codes = value ? [value] : []
           radio.setSelect(codes, controlContext, controlRule)
         }
         // 修改后控件结束索引

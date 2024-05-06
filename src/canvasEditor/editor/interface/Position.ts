@@ -42,8 +42,8 @@ export type IGetFloatPositionByXYPayload = IGetPositionByXYPayload & {
 export interface IPositionContext {
   isTable: boolean
   isCheckbox?: boolean
-  isControl?: boolean,
   isRadio?: boolean
+  isControl?: boolean
   index?: number
   trIndex?: number
   tdIndex?: number

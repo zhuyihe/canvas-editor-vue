@@ -3,6 +3,7 @@ import { EditorZone } from '../dataset/enum/Editor'
 import { ICheckbox } from './Checkbox'
 import { IRadio } from './Radio'
 import { IElement } from './Element'
+import { IRadio } from './Radio'
 import { IRange } from './Range'
 
 export interface IValueSet {
@@ -22,13 +23,13 @@ export interface IControlCheckbox {
   valueSets: IValueSet[]
   checkbox?: ICheckbox
 }
+
 export interface IControlRadio {
   code: string | null
-  min?: number
-  max?: number
   valueSets: IValueSet[]
   radio?: IRadio
 }
+
 export interface IControlHighlightRule {
   keyword: string
   alpha?: number

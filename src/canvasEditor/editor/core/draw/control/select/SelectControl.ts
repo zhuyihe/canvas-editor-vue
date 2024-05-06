@@ -255,6 +255,7 @@ export class SelectControl implements IControlInstance {
 
   private _createSelectPopupDom() {
     const control = this.element.control!
+    console.log('_createSelectPopupDom',control)
     const valueSets = control.valueSets
     if (!Array.isArray(valueSets) || !valueSets.length) return
     const position = this.control.getPosition()

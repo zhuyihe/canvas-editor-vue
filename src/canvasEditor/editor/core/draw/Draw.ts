@@ -181,8 +181,9 @@ export class Draw {
     this.options = options
     this.elementList = data.main
     this.listener = listener
-    this.eventBus = eventBus 
+    this.eventBus = eventBus
     this.override = override
+
     this._formatContainer()
     this.pageContainer = this._createPageContainer()
     this._createPage(0)
@@ -288,6 +289,7 @@ export class Draw {
       this.setEditorData(this.printModeData)
       this.printModeData = null
     }
+    this.range.clearRange()
     this.mode = payload
     this.render({
       isSetCursor: false,
@@ -566,7 +568,6 @@ export class Draw {
   }
 
   public insertElementList(payload: IElement[]) {
-    console.log(payload,'payload')
     if (!payload.length || !this.range.getIsCanInput()) return
     const { startIndex, endIndex } = this.range.getRange()
     if (!~startIndex && !~endIndex) return
@@ -1411,35 +1412,37 @@ export class Draw {
           }
         }
       } else if (element.type === ElementType.SEPARATOR) {
+        const {
+          separator: { lineWidth }
+        } = this.options
         element.width = availableWidth / scale
         metrics.width = availableWidth
-        metrics.height = defaultSize
+        metrics.height = lineWidth * scale
         metrics.boundingBoxAscent = -rowMargin
-        metrics.boundingBoxDescent = -rowMargin
+        metrics.boundingBoxDescent = -rowMargin + metrics.height
       } else if (element.type === ElementType.PAGE_BREAK) {
         element.width = availableWidth / scale
         metrics.width = availableWidth
         metrics.height = defaultSize
       } else if (
-        element.type === ElementType.CHECKBOX ||
-        element.controlComponent === ControlComponent.CHECKBOX
+        element.type === ElementType.RADIO ||
+        element.controlComponent === ControlComponent.RADIO
       ) {
-        console.log('radio',element)
         const { width, height, gap } = this.options.radio
         const elementWidth = width + gap * 2
         element.width = elementWidth
         metrics.width = elementWidth * scale
         metrics.height = height * scale
-      }else if( 
-        element.type === ElementType.RADIO ||
-        element.controlComponent === ControlComponent.RADIO
-        ){
-          const { width, height, gap } = this.options.radio
+      } else if (
+        element.type === ElementType.CHECKBOX ||
+        element.controlComponent === ControlComponent.CHECKBOX
+      ) {
+        const { width, height, gap } = this.options.checkbox
         const elementWidth = width + gap * 2
         element.width = elementWidth
         metrics.width = elementWidth * scale
         metrics.height = height * scale
-        } else if (element.type === ElementType.TAB) {
+      } else if (element.type === ElementType.TAB) {
         metrics.width = defaultTabWidth * scale
         metrics.height = defaultSize * scale
         metrics.boundingBoxDescent = 0
@@ -1536,8 +1539,11 @@ export class Draw {
               elementList,
               i
             )
-            curRowWidth += width
-            nextElement = endElement
+            // 单词宽度大于行可用宽度，无需折行
+            if (width <= availableWidth) {
+              curRowWidth += width
+              nextElement = endElement
+            }
           }
           // 标点符号
           curRowWidth += this.textParticle.measurePunctuationWidth(
@@ -1579,15 +1585,20 @@ export class Draw {
         ) {
           curRow.height = defaultBasicRowMarginHeight
         }
-        // 两端对齐
+        // 两端对齐、分散对齐
         if (
-          preElement?.rowFlex === RowFlex.ALIGNMENT &&
-          curRowWidth > availableWidth
+          preElement?.rowFlex === RowFlex.JUSTIFY ||
+          (preElement?.rowFlex === RowFlex.ALIGNMENT && isWidthNotEnough)
         ) {
+          // 忽略换行符及尾部元素间隔设置
+          const rowElementList =
+            curRow.elementList[0]?.value === ZERO
+              ? curRow.elementList.slice(1)
+              : curRow.elementList
           const gap =
-            (availableWidth - curRow.width) / curRow.elementList.length
-          for (let e = 0; e < curRow.elementList.length; e++) {
-            const el = curRow.elementList[e]
+            (availableWidth - curRow.width) / (rowElementList.length - 1)
+          for (let e = 0; e < rowElementList.length - 1; e++) {
+            const el = rowElementList[e]
             el.metrics.width += gap
           }
           curRow.width = availableWidth
@@ -1818,16 +1829,18 @@ export class Draw {
         ) {
           this.textParticle.complete()
           this.checkboxParticle.render(ctx, element, x, y + offsetY)
-        }else if (
+        } else if (
           element.type === ElementType.RADIO ||
           element.controlComponent === ControlComponent.RADIO
         ) {
-          console.log('RADIO')
           this.textParticle.complete()
           this.radioParticle.render(ctx, element, x, y + offsetY)
         } else if (element.type === ElementType.TAB) {
           this.textParticle.complete()
-        } else if (element.rowFlex === RowFlex.ALIGNMENT) {
+        } else if (
+          element.rowFlex === RowFlex.ALIGNMENT ||
+          element.rowFlex === RowFlex.JUSTIFY
+        ) {
           // 如果是两端对齐，因canvas目前不支持letterSpacing需单独绘制文本
           this.textParticle.record(ctx, element, x, y + offsetY)
           this.textParticle.complete()
