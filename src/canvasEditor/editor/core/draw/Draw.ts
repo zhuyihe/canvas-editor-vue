@@ -2207,6 +2207,7 @@ export class Draw {
   }
 
   public render(payload?: IDrawOption) {
+    console.log(payload,'payload')
     const { header, footer } = this.options
     const {
       isSubmitHistory = true,

@@ -42,3 +42,176 @@
   color: var(--COLOR-HOVER, #5175f4);
   font-weight: 700;
 }
+/* 多选下拉容器样式，基于给出的.ce-select-control-popup的样式 */
+/* .ce-mutiselect-popup-container {
+  max-width: 160px;
+  min-width: 69px;
+  max-height: 225px;
+  position: absolute;
+  z-index: 1;
+  border: 1px solid #e4e7ed;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
+  box-sizing: border-box;
+  margin: 5px 0;
+  overflow-y: auto;
+}
+
+.ce-mutiselect-popup-container ul {
+  list-style: none;
+  padding: 3px 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.ce-mutiselect-popup-container ul li {
+  font-size: 13px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #666;
+  height: 36px;
+  line-height: 36px;
+  box-sizing: border-box;
+  cursor: pointer;
+  label{
+    line-height: 37px;
+  }
+}
+
+.ce-mutiselect-popup-container ul li:hover {
+  background-color: #EEF2FD;
+}
+
+.ce-mutiselect-popup-container ul li.active,
+.ce-mutiselect-popup-container ul li input[type='checkbox']:checked+label {
+  color: var(--COLOR-HOVER, #5175f4);
+  font-weight: 700;
+}
+
+.ce-mutiselect-popup-container input[type='checkbox'] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #f0f0f0;
+  border: 1px solid #cacece;
+  padding: 7px;
+  border-radius: 3px;
+  display: inline-block;
+  position: relative;
+}
+
+.ce-mutiselect-popup-container input[type='checkbox']:checked::before {
+  content: '✔';
+  position: absolute;
+  top: -3px;
+  left: 3px;
+  color: #099;
+}
+
+.ce-mutiselect-popup-container input[type='checkbox']:focus {
+  outline: none;
+}
+
+
+.ce-mutiselect-popup-container label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-left: 7px; 
+} */
+/* 弹出菜单容器 */
+.ce-mutiselect-popup-container {
+  position: absolute;
+  z-index: 1000;
+  width: 280px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+  opacity: 0;
+  transition: opacity 150ms ease-in-out;
+  animation: slide-down .2s ease-in-out forwards;
+  overflow: hidden;
+}
+
+@keyframes slide-down {
+  0% {
+    transform: translateY(-5%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.ce-mutiselect-popup-search {
+  padding:10px;
+}
+.ce-mutiselect-popup-search input {
+  -webkit-appearance: none;
+  background-color: #fff;
+  background-image: none;
+  border-radius: 4px;
+  border: 1px solid #dcdfe6;
+  box-sizing: border-box;
+  color: #606266;
+  display: inline-block;
+  font-size: inherit;
+  height: 30px;
+  line-height: 30px;
+  outline: none;
+  padding: 0 15px;
+  transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+  width: 100%;
+}
+.ce-mutiselect-popup-search input:focus {
+  border-color: #409eff;
+}
+
+.ce-mutiselect-popup-container ul {
+  list-style: none;
+  padding: 6px 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.ce-mutiselect-popup-container li {
+  font-size: 14px;
+  padding: 0 20px;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #606266;
+  height: 34px;
+  line-height: 34px;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+
+.ce-mutiselect-popup-container li.selected{
+  color: #409eff;
+  background-color: #fff;
+}
+.ce-mutiselect-popup-container li:hover {
+  background-color: #f7f7f7;
+}
+/* 选中项对勾的样式 */
+.ce-mutiselect-popup-container li.selected:after {
+  content: '✔';
+  font-size: 16px;
+  position: absolute;
+  right: 10px;
+  color: #409eff;
+  font-weight: bold;
+}

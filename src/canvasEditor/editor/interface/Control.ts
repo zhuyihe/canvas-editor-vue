@@ -15,6 +15,11 @@ export interface IControlSelect {
   code: string | null
   valueSets: IValueSet[]
 }
+export interface IControlMutselect {
+  code: string | null
+  valueSets: IValueSet[],
+  radio?: IRadio
+}
 
 export interface IControlCheckbox {
   code: string | null
@@ -74,6 +79,7 @@ export type IControl = IControlBasic &
   Partial<IControlSelect> &
   Partial<IControlCheckbox> &
   Partial<IControlRadio> &
+  Partial<IControlMutselect> &
   Partial<IControlStyle>
 
 export interface IControlOption {
