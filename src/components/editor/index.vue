@@ -64,9 +64,9 @@ export default {
           value: '',
           control: {
             conceptId: '1',
-            code:'11,22',
+            code:'11',
             placeholder:"请填写",
-            type: 'mutiselect',
+            type: 'select',
             // prefix:' ',
             // postfix:" ",
             value:[],
