@@ -3,7 +3,6 @@ import { EditorZone } from '../dataset/enum/Editor'
 import { ICheckbox } from './Checkbox'
 import { IRadio } from './Radio'
 import { IElement } from './Element'
-import { IRadio } from './Radio'
 import { IRange } from './Range'
 
 export interface IValueSet {

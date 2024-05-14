@@ -10,6 +10,7 @@
   "dependencies": {
     "@types/prismjs": "1.26.0",
     "element-ui": "^2.15.14",
+    "fo-editor": "^0.0.11",
     "js-cookie": "^3.0.5",
     "prismjs": "1.27.0",
     "tslib": "^2.6.2",
