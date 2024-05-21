@@ -59,20 +59,22 @@ export default {
               rowFlex: RowFlex.CENTER
             }
           ],
-          main: [{
+          main: [
+            {
           type: 'control',
           value: '',
           control: {
             conceptId: '1',
-            code:'11',
+            code:'11,22,33,44',
             placeholder:"请填写",
-            type: 'select',
+            type: 'mutiselect',
             // prefix:' ',
             // postfix:" ",
             value:[],
-            valueSets:[{value:'11',code:'11'},{value:'22',code:'22'}],
+            valueSets:[{value:'我做',code:'11'},{value:'做1',code:'22'},{value:'哈哈',code:'33'},{value:'呵呵',code:'44'}],
           }
-        },{
+        },
+        {
           type: 'control',
           value: '',
           control: {
@@ -82,23 +84,25 @@ export default {
             type: 'text',
             // prefix:' ',
             // postfix:" ",
-            value:[],
+            value:[{value:"1111"}],
             
           }
-        },{
-          type: 'control',
-          value: '',
-          control: {
-            conceptId: '1',
-            code:'',
-            placeholder:"请填写",
-            type: 'select',
-            // prefix:' ',
-            // postfix:" ",
-            value:[],
-            valueSets:[{value:'11',code:'11'},{value:'22',code:'22'}],
-          }
-        }]
+        },
+        // {
+        //   type: 'control',
+        //   value: '',
+        //   control: {
+        //     conceptId: '1',
+        //     code:'11',
+        //     placeholder:"请填写",
+        //     type: 'select',
+        //     // prefix:' ',
+        //     // postfix:" ",
+        //     value:[],
+        //     valueSets:[{value:'11',code:'11'},{value:'22',code:'22'}],
+        //   }
+        // }
+      ]
         },
         this.editorOptions
       )

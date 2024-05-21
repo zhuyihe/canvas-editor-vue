@@ -74,7 +74,7 @@ export function formatElementList(
     isHandleFirstElement: true,
     ...options
   }
-  console.log(elementList,'elementList')
+  console.log(elementList,options,'elementList')
   const startElement = elementList[0]
   // 非首字符零宽节点文本元素则补偿-列表元素内部会补偿此处忽略
   if (
@@ -372,12 +372,12 @@ export function formatElementList(
             if (Array.isArray(valueSets) && valueSets.length) {
               const valueSet = valueSets.filter(v => codeList.includes(v.code))
               if (valueSet.length) {
-                valueList=valueSet.map(item=>{return {value:`${item.value}，`}})
+                valueList=valueSet.map(item=>{return {value:`，${item.value}`}})
                 formatElementList(valueList, {
                   ...options,
                   isHandleFirstElement: false
                 })
-                valueList.pop()
+                valueList.shift()
                 for (let v = 0; v < valueList.length; v++) {
                   const element = valueList[v]
                   const value = element.value
