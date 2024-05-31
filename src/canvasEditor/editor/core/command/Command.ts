@@ -90,6 +90,8 @@ export class Command {
   public executeSetControlExtension: CommandAdapt['setControlExtension']
   public executeSetControlProperties: CommandAdapt['setControlProperties']
   public executeSetControlHighlight: CommandAdapt['setControlHighlight']
+  public executeUpdateOptions: CommandAdapt['updateOptions']
+  public executeInsertTitle: CommandAdapt['insertTitle']
   public getCatalog: CommandAdapt['getCatalog']
   public getImage: CommandAdapt['getImage']
   public getOptions: CommandAdapt['getOptions']
@@ -205,6 +207,8 @@ export class Command {
     this.executeDeleteGroup = adapt.deleteGroup.bind(adapt)
     this.executeLocationGroup = adapt.locationGroup.bind(adapt)
     this.executeSetZone = adapt.setZone.bind(adapt)
+    this.executeUpdateOptions = adapt.updateOptions.bind(adapt)
+    this.executeInsertTitle = adapt.insertTitle.bind(adapt)
     // 获取
     this.getImage = adapt.getImage.bind(adapt)
     this.getOptions = adapt.getOptions.bind(adapt)

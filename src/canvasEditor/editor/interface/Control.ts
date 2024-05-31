@@ -1,7 +1,10 @@
 import { ControlType, ControlIndentation } from '../dataset/enum/Control'
 import { EditorZone } from '../dataset/enum/Editor'
+import { MoveDirection } from '../dataset/enum/Observer'
 import { ICheckbox } from './Checkbox'
+import { IDrawOption } from './Draw'
 import { IElement } from './Element'
+import { IPositionContext } from './Position'
 import { IRadio } from './Radio'
 import { IRange } from './Range'
 
@@ -97,18 +100,15 @@ export interface IControlInitResult {
 }
 
 export interface IControlInstance {
+  setElement(element: IElement): void
   getElement(): IElement
-
   getValue(): IElement[]
-
   setValue(
     data: IElement[],
     context?: IControlContext,
     options?: IControlRuleOption
   ): number
-
   keydown(evt: KeyboardEvent): number | null
-
   cut(): number
 }
 
@@ -119,6 +119,7 @@ export interface IControlContext {
 
 export interface IControlRuleOption {
   isIgnoreDisabledRule?: boolean // 忽略禁用校验规则
+  isAddPlaceholder?: boolean // 是否添加占位符
 }
 
 export interface IGetControlValueOption {
@@ -146,4 +147,18 @@ export type ISetControlHighlightOption = IControlHighlight[]
 export type ISetControlProperties = {
   conceptId: string
   properties: Partial<Omit<IControl, 'value'>>
+}
+
+export type IRepaintControlOption = Pick<
+  IDrawOption,
+  'curIndex' | 'isCompute' | 'isSubmitHistory'
+>
+
+export interface INextControlContext {
+  positionContext: IPositionContext
+  nextIndex: number
+}
+
+export interface IInitNextControlOption {
+  direction?: MoveDirection
 }
