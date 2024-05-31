@@ -189,7 +189,9 @@ export class MutiselectControl implements IControlInstance {
     }
     return endIndex
   }
-
+  public setElement(element: IElement) {
+    this.element = element
+  }
   public cut(): number {
     if (this.control.getIsDisabledControl()) {
       return -1
@@ -275,7 +277,9 @@ export class MutiselectControl implements IControlInstance {
       const start = prefixIndex
       if (!context.range) {
         const newIndex = start
-        this.control.repaintControl(newIndex)
+        this.control.repaintControl({
+          curIndex: newIndex
+        })
       }
     } else {
       const valueList = valueSet.map(item => {
@@ -322,7 +326,9 @@ export class MutiselectControl implements IControlInstance {
       // 重新渲染控件
       if (!context.range) {
         const newIndex = start + data.length - 1
-        this.control.repaintControl(newIndex)
+        this.control.repaintControl({
+          curIndex: newIndex
+        })
       }
     }
   }

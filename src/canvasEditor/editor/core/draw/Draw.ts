@@ -64,7 +64,7 @@ import {
 } from '../../dataset/enum/Editor'
 import { Control } from './control/Control'
 import {
-  getIsInlineElement,
+  getIsBlockElement,
   getSlimCloneElementList,
   zipElementList
 } from '../../utils/element'
@@ -682,7 +682,7 @@ export class Draw {
       if (!this.control.getActiveControl()) {
         let deleteIndex = endIndex - 1
         while (deleteIndex >= start) {
-          if (elementList[deleteIndex].control?.deletable !== false) {
+          if (elementList[deleteIndex]?.control?.deletable !== false) {
             elementList.splice(deleteIndex, 1)
           }
           deleteIndex--
@@ -868,10 +868,19 @@ export class Draw {
       this.footer.recovery()
       this.zone.setZone(EditorZone.MAIN)
     }
+    const { startIndex } = this.range.getRange()
+    const isCollapsed = this.range.getIsCollapsed()
     this.render({
-      isSubmitHistory: false,
-      isSetCursor: false
+      isSetCursor: true,
+      curIndex: startIndex,
+      isSubmitHistory: false
     })
+    // 重新定位避免事件监听丢失
+    if (!isCollapsed) {
+      this.cursor.drawCursor({
+        isShow: false
+      })
+    }
     // 回调
     setTimeout(() => {
       if (this.listener.pageModeChange) {
@@ -1190,21 +1199,13 @@ export class Draw {
         } else {
           const elementWidth = element.width! * scale
           const elementHeight = element.height! * scale
-          // 图片超出尺寸后自适应
-          const curRowWidth =
-            element.imgDisplay === ImageDisplay.INLINE ? 0 : curRow.width
-          if (curRowWidth + elementWidth > availableWidth) {
-            // 计算剩余大小
-            const surplusWidth = availableWidth - curRowWidth
-            const adaptiveWidth =
-              surplusWidth > 0
-                ? surplusWidth
-                : Math.min(elementWidth, availableWidth)
+          // 图片超出尺寸后自适应（图片大小大于可用宽度时）
+          if (elementWidth > availableWidth) {
             const adaptiveHeight =
-              (elementHeight * adaptiveWidth) / elementWidth
-            element.width = adaptiveWidth / scale
+              (elementHeight * availableWidth) / elementWidth
+            element.width = availableWidth / scale
             element.height = adaptiveHeight / scale
-            metrics.width = adaptiveWidth
+            metrics.width = availableWidth
             metrics.height = adaptiveHeight
             metrics.boundingBoxDescent = adaptiveHeight
           } else {
@@ -1599,27 +1600,8 @@ export class Draw {
         (i !== 0 && element.value === ZERO)
       // 是否宽度不足导致换行
       const isWidthNotEnough = curRowWidth > availableWidth
+      // 新行数据处理
       if (isForceBreak || isWidthNotEnough) {
-        // 换行原因：宽度不足
-        curRow.isWidthNotEnough = isWidthNotEnough && !isForceBreak
-        // 两端对齐、分散对齐
-        if (
-          preElement?.rowFlex === RowFlex.JUSTIFY ||
-          (preElement?.rowFlex === RowFlex.ALIGNMENT && isWidthNotEnough)
-        ) {
-          // 忽略换行符及尾部元素间隔设置
-          const rowElementList =
-            curRow.elementList[0]?.value === ZERO
-              ? curRow.elementList.slice(1)
-              : curRow.elementList
-          const gap =
-            (availableWidth - curRow.width) / (rowElementList.length - 1)
-          for (let e = 0; e < rowElementList.length - 1; e++) {
-            const el = rowElementList[e]
-            el.metrics.width += gap
-          }
-          curRow.width = availableWidth
-        }
         const row: IRow = {
           width: metrics.width,
           height,
@@ -1660,8 +1642,8 @@ export class Draw {
         rowList.push(row)
       } else {
         curRow.width += metrics.width
-        // 减小行元素前第一行空行行高
-        if (i === 0 && getIsInlineElement(elementList[1])) {
+        // 减小块元素前第一行空行行高
+        if (i === 0 && getIsBlockElement(elementList[1])) {
           curRow.height = defaultBasicRowMarginHeight
           curRow.ascent = defaultBasicRowMarginHeight
         } else if (curRow.height < height) {
@@ -1669,6 +1651,29 @@ export class Draw {
           curRow.ascent = ascent
         }
         curRow.elementList.push(rowElement)
+      }
+      // 行结束时逻辑
+      if (isForceBreak || isWidthNotEnough || i === elementList.length - 1) {
+        // 换行原因：宽度不足
+        curRow.isWidthNotEnough = isWidthNotEnough && !isForceBreak
+        // 两端对齐、分散对齐
+        if (
+          preElement?.rowFlex === RowFlex.JUSTIFY ||
+          (preElement?.rowFlex === RowFlex.ALIGNMENT && isWidthNotEnough)
+        ) {
+          // 忽略换行符及尾部元素间隔设置
+          const rowElementList =
+            curRow.elementList[0]?.value === ZERO
+              ? curRow.elementList.slice(1)
+              : curRow.elementList
+          const gap =
+            (availableWidth - curRow.width) / (rowElementList.length - 1)
+          for (let e = 0; e < rowElementList.length - 1; e++) {
+            const el = rowElementList[e]
+            el.metrics.width += gap
+          }
+          curRow.width = availableWidth
+        }
       }
     }
     return rowList
@@ -2126,7 +2131,12 @@ export class Draw {
   private _clearPage(pageNo: number) {
     const ctx = this.ctxList[pageNo]
     const pageDom = this.pageList[pageNo]
-    ctx.clearRect(0, 0, pageDom.width, pageDom.height)
+    ctx.clearRect(
+      0,
+      0,
+      Math.max(pageDom.width, this.getWidth()),
+      Math.max(pageDom.height, this.getHeight())
+    )
     this.blockParticle.clear()
   }
 
@@ -2320,6 +2330,10 @@ export class Draw {
     }
     // 信息变动回调
     nextTick(() => {
+      // 重新唤起弹窗类控件
+      if (isCompute && this.control.getActiveControl()) {
+        this.control.reAwakeControl()
+      }
       // 表格工具重新渲染
       if (
         isCompute &&
