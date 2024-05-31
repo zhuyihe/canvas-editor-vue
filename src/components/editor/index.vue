@@ -88,20 +88,20 @@ export default {
             
           }
         },
-        // {
-        //   type: 'control',
-        //   value: '',
-        //   control: {
-        //     conceptId: '1',
-        //     code:'11',
-        //     placeholder:"请填写",
-        //     type: 'select',
-        //     // prefix:' ',
-        //     // postfix:" ",
-        //     value:[],
-        //     valueSets:[{value:'11',code:'11'},{value:'22',code:'22'}],
-        //   }
-        // }
+        {
+          type: 'control',
+          value: '',
+          control: {
+            conceptId: '1',
+            code:'11',
+            placeholder:"请填写",
+            type: 'select',
+            // prefix:' ',
+            // postfix:" ",
+            value:[],
+            valueSets:[{value:'11',code:'11'},{value:'22',code:'22'}],
+          }
+        }
       ]
         },
         this.editorOptions

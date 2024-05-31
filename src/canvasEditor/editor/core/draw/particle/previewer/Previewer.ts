@@ -71,7 +71,8 @@ export class Previewer {
     let y = 0
     const height = this.draw.getHeight()
     const pageGap = this.draw.getPageGap()
-    const preY = this.draw.getPageNo() * (height + pageGap)
+    const pageNo = position?.pageNo ?? this.draw.getPageNo()
+    const preY = pageNo * (height + pageGap)
     // 优先使用浮动位置
     if (element.imgFloatPosition) {
       x = element.imgFloatPosition.x!
@@ -172,12 +173,10 @@ export class Previewer {
         if (this.curElement) {
           this.curElement.width = this.width
           this.curElement.height = this.height
-          this.draw.render({ isSetCursor: false })
-          this.drawResizer(
-            this.curElement,
-            this.curPosition,
-            this.previewerDrawOption
-          )
+          this.draw.render({
+            isSetCursor: true,
+            curIndex: this.curPosition?.index
+          })
         }
         // 还原副作用
         this.resizerImageContainer.style.display = 'none'

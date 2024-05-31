@@ -17,12 +17,7 @@ import {
   IControlRuleOption
 } from '../../../../interface/Control'
 import { IElement } from '../../../../interface/Element'
-import {
-  NoDeleteOptions,
-  ValueListOption,
-  ReduceAccumulator,
-  CurentIndex
-} from '../../../../interface/MutiSelect'
+import { ValueListOption } from '../../../../interface/MutiSelect'
 import { omitObject, pickObject, splitText } from '../../../../utils'
 import { formatElementContext } from '../../../../utils/element'
 import { Control } from '../Control'
@@ -42,6 +37,10 @@ export class MutiselectControl implements IControlInstance {
 
   public getElement(): IElement {
     return this.element
+  }
+
+  public getIsPopup(): boolean {
+    return this.isPopup
   }
 
   public getCode(): string[] {
@@ -164,12 +163,10 @@ export class MutiselectControl implements IControlInstance {
           endElement.controlComponent === ControlComponent.POSTFIX ||
           startElement.controlComponent === ControlComponent.PLACEHOLDER
         ) {
-          console.log('removeControl')
           // 前缀、后缀、占位符
           return this.control.removeControl(startIndex)
         } else {
           // 清空选项
-          // return this.removeOptions() 
           return this.removeOptions()
         }
       }
@@ -190,14 +187,15 @@ export class MutiselectControl implements IControlInstance {
           return this.control.removeControl(startIndex)
         } else {
           // 清空选项
-          // return this.clearSelect()
           return this.removeOptions()
         }
       }
     }
     return endIndex
   }
-
+  public setElement(element: IElement) {
+    this.element = element
+  }
   public cut(): number {
     if (this.control.getIsDisabledControl()) {
       return -1
@@ -253,22 +251,17 @@ export class MutiselectControl implements IControlInstance {
 
     if (!~leftIndex || !~rightIndex) return -1
 
-    const { selectCodes, cursorIndex, sIndex, eIndex } = this.getSelectCodes(
-      context,
-      leftIndex
-    )
-    this.destroy()
-    console.log(selectCodes, sIndex, eIndex, 'selectCodes')
+    const { selectCodes } = this.getSelectCodes(context, leftIndex)
+    const oldCode = this.element.control!.code || ''
+    
     this.setSelect(selectCodes) // 更新选项
+    const cursorIndex = this.getCurentIndex(selectCodes, oldCode, leftIndex)
     return cursorIndex
   }
 
   public getSelectCodes(context: IControlContext = {}, leftIndex: number): any {
     const { startIndex, endIndex } = context.range || this.control.getRange()
     const { valueList } = this.getValueSets()
-    console.log(valueList, 'valueList')
-    const noDeleteOptions: NoDeleteOptions = {}
-    const deleteOptions: NoDeleteOptions = {}
     let currentIndex = 0,
       selectCodes: string[] = []
 
@@ -284,136 +277,48 @@ export class MutiselectControl implements IControlInstance {
     })
     const start = startIndex - leftIndex,
       end = endIndex - startIndex == 1 ? start : endIndex - startIndex + start
-    selectCodes = valueList.reduce(
-      (acc: string[], obj: ValueListOption, index: number) => {
-        console.log(valueList, 'valueListvalueList')
-        const valueStartIdx: number = obj.startIndex || 0
-        const valueEndIdx: number = valueStartIdx + obj.value.length - 1
-        if (startIndex != endIndex) {
-          if (valueStartIdx > end || valueEndIdx < start) {
-            acc.push(obj.code)
-            noDeleteOptions[index] = obj
-          } else {
-            deleteOptions[index] = obj
-          }
-        } else {
-          if (start - 1 > valueEndIdx || start - 1 < valueStartIdx) {
-            acc.push(obj.code)
-            noDeleteOptions[index] = obj
-          } else {
-            deleteOptions[index] = obj
-          }
+    selectCodes = valueList.reduce((acc: string[], obj: ValueListOption) => {
+      const valueStartIdx: number = obj.startIndex || 0
+      const valueEndIdx: number = valueStartIdx + obj.value.length - 1
+      if (startIndex != endIndex) {
+        if (valueStartIdx > end || valueEndIdx < start) {
+          acc.push(obj.code)
         }
-        return acc
-      },
-      []
-    )
-    console.log(noDeleteOptions, selectCodes, 'noDeleteOptions')
-    const { cursorIndex, sIndex, eIndex } = this.getCurentIndex(
-      noDeleteOptions,
-      deleteOptions,
-      leftIndex
-    )
-
-    return { selectCodes, cursorIndex, sIndex, eIndex }
+      } else {
+        if (start - 1 > valueEndIdx || start - 1 < valueStartIdx) {
+          acc.push(obj.code)
+        }
+      }
+      return acc
+    }, [])
+    return { selectCodes }
   }
 
   public getCurentIndex(
-    noDeleteOptions: NoDeleteOptions,
-    deleteOptions: NoDeleteOptions,
+    codes: string[],
+    oldCode: string,
     leftIndex: number
-  ): CurentIndex {
-    console.log(noDeleteOptions, leftIndex)
-    let cursorIndex = 0,
-      sIndex = 0,
-      eIndex = 0
-    // 获取对象的所有键并按数字升序排序
-    const keys = Object.keys(noDeleteOptions)
-      .map(Number)
-      .sort((a, b) => a - b)
-    // const elementList = context.elementList || this.control.getElementList()
-    const result: ReduceAccumulator = keys.reduce<ReduceAccumulator>(
-      (acc, key, index, arr) => {
-        // 检测是否不连续
-        if (index > 0 && key !== arr[index - 1] + 1) {
-          acc.isContinuous = false
-          const previousKey = arr[index - 1]
-          const missingLength = Object.values(deleteOptions).reduce(
-            (acc, current) => acc + current.value.length,
-            0
-          )
-          acc.discontinuousItems = {
-            previous: previousKey,
-            current: key,
-            missingLength: missingLength,
-            startIndex: acc.totalLengthUntilDiscontinuity,
-            endIndex: noDeleteOptions[key].startIndex || 0 - 1
-          }
-          acc.processLength = false
-        }
-        if (acc.processLength) {
-          acc.totalLengthUntilDiscontinuity += noDeleteOptions[key].value.length
-        }
-        return acc
-      },
-      {
-        isContinuous: true,
-        discontinuousItems: {},
-        totalLengthUntilDiscontinuity: 0,
-        processLength: true // 初始状态下，开始累积长度
-      }
+  ): number {
+    console.log(leftIndex)
+    let cursorIndex = leftIndex
+    const oldCodeArr = oldCode.split(',')
+    const commonParts = codes.filter(
+      (element, index) => element === oldCodeArr[index]
     )
-
-    if (result.isContinuous) {
-      const hasZeroKey = Object.keys(noDeleteOptions).includes('0')
-      console.log('对象中的键是连续的。', hasZeroKey, noDeleteOptions)
-      if (!hasZeroKey) {
-        sIndex = leftIndex
-        console.log(noDeleteOptions, deleteOptions, leftIndex)
-        if (!Object.keys(noDeleteOptions).length) {
-          cursorIndex = this.clearSelect()
-        } else {
-          eIndex = Object.values(deleteOptions['0']).length + leftIndex
-          cursorIndex = leftIndex
-        }
-      } else {
-        const delValueLength = Object.values(deleteOptions).reduce(
-          (total, item) => total + item.value.length,
-          0
-        )
-        const nodelValueLength = Object.values(noDeleteOptions).reduce(
-          (total, item) => total + item.value.length,
-          0
-        )
-
-        sIndex = nodelValueLength + leftIndex - 1
-        eIndex = nodelValueLength + delValueLength + leftIndex - 1
-        cursorIndex = sIndex + 1
-      }
-    } else {
-      console.log(
-        '对象中的键不是连续的，不连续的项为：',
-        result.discontinuousItems
-      )
-      console.log(
-        '不连续点前的value总长度为：',
-        result.totalLengthUntilDiscontinuity
-      )
-      const { startIndex: start, endIndex: end } =
-        result.discontinuousItems as { startIndex: number; endIndex: number }
-      sIndex = start
-      eIndex = end
-      cursorIndex = result.totalLengthUntilDiscontinuity + leftIndex
+    if (commonParts.length) {
+      const { dataStr } = this.getValueSets(commonParts)
+      cursorIndex += dataStr.length
     }
-    return { cursorIndex, sIndex, eIndex }
+    return cursorIndex
   }
 
   public clearSelect(
     context: IControlContext = {},
     options: IControlRuleOption = {}
   ): number {
+    const { isIgnoreDisabledRule = false, isAddPlaceholder = true } = options
     // 校验是否可以设置
-    if (!options.isIgnoreDisabledRule && this.control.getIsDisabledControl()) {
+    if (!isIgnoreDisabledRule && this.control.getIsDisabledControl()) {
       return -1
     }
     const elementList = context.elementList || this.control.getElementList()
@@ -447,22 +352,23 @@ export class MutiselectControl implements IControlInstance {
       }
       nextIndex++
     }
-
     if (!~leftIndex || !~rightIndex) return -1
     // 删除元素
     const draw = this.control.getDraw()
     draw.spliceElementList(elementList, leftIndex + 1, rightIndex - leftIndex)
     // 增加占位符
-    this.control.addPlaceholder(preIndex, context)
+    if (isAddPlaceholder) {
+      this.control.addPlaceholder(preIndex, context)
+    }
     this.element.control!.code = null
     return preIndex
   }
 
-  private getValueSets(): any {
+  private getValueSets(codeArr?: string[]): any {
     const control = this.element.control!
     console.log(control, 'control')
     const valueSets = control.valueSets
-    const codes = this.getCode()
+    const codes = codeArr || this.getCode()
 
     if (!Array.isArray(valueSets) || !valueSets.length) return {}
     // 转换code
@@ -480,7 +386,7 @@ export class MutiselectControl implements IControlInstance {
     for (const i of valueList) {
       dataStr += i.value
     }
-    dataStr = dataStr.slice(0, -1)
+    // dataStr = dataStr.slice(0, -1)
     return {
       dataStr,
       valueList
@@ -490,26 +396,44 @@ export class MutiselectControl implements IControlInstance {
   public setSelect(
     codes: string[],
     context: IControlContext = {},
-    options: IControlRuleOption = {}
+    options: IControlRuleOption = {},
   ) {
     // 校验是否可以设置
     if (!options.isIgnoreDisabledRule && this.control.getIsDisabledControl()) {
       return
     }
+    const elementList = context.elementList || this.control.getElementList()
+    const range = context.range || this.control.getRange()
     const control = this.element.control!
+    const oldCode = control.code
     const valueSets = control.valueSets
-
+    // 选项相同时无需重复渲染
+    if (codes.join(',') === oldCode) {
+      this.control.repaintControl({
+        curIndex: range.startIndex,
+        isCompute: false,
+        isSubmitHistory: false
+      })
+      this.destroy()
+      return
+    }
     if (!Array.isArray(valueSets) || !valueSets.length) return
     // 转换code
     const valueSet = valueSets.filter(v => codes.includes(v.code))
     console.log(valueSet, 'valueSet')
     if (!valueSet.length) {
-      const prefixIndex = this.clearSelect(context)
+      const prefixIndex = this.clearSelect(context, {
+        isAddPlaceholder: true
+      })
       if (!~prefixIndex) return
       const start = prefixIndex
       if (!context.range) {
         const newIndex = start
-        this.control.repaintControl(newIndex)
+        this.control.repaintControl({
+          curIndex: newIndex
+        })
+        // 设置状态
+        control.code = ''
       }
     } else {
       const valueList = valueSet.map(item => {
@@ -521,17 +445,20 @@ export class MutiselectControl implements IControlInstance {
       }
       dataStr = dataStr.substring(1)
       console.log(dataStr, 'dataStr')
-      const elementList = context.elementList || this.control.getElementList()
-      const range = context.range || this.control.getRange()
       // 样式赋值元素-默认值的第一个字符样式，否则取默认样式
       const valueElement = this.getValue(context)[0]
       const styleElement = valueElement
         ? pickObject(valueElement, EDITOR_ELEMENT_STYLE_ATTR)
         : pickObject(elementList[range.startIndex], CONTROL_STYLE_ATTR)
       // 清空选项
-      const prefixIndex = this.clearSelect(context)
+      const prefixIndex = this.clearSelect(context, {
+        isAddPlaceholder: false
+      })
       if (!~prefixIndex) return
-      this.control.removePlaceholder(prefixIndex, context)
+      // 当前无值时清空占位符
+      if (!oldCode) {
+        this.control.removePlaceholder(prefixIndex, context)
+      }
       // 属性赋值元素-默认为前缀属性
       const propertyElement = omitObject(
         elementList[prefixIndex],
@@ -552,11 +479,14 @@ export class MutiselectControl implements IControlInstance {
         draw.spliceElementList(elementList, start + i, 0, newElement)
       }
       // 设置状态
-      this.element.control!.code = codes.join(',')
+      control.code = codes.join(',')
+      console.log(context.range, context)
       // 重新渲染控件
       if (!context.range) {
-        const newIndex = start + data.length - 1
-        this.control.repaintControl(newIndex)
+        const newIndex =start + data.length - 1
+        this.control.repaintControl({
+          curIndex: newIndex
+        })
         this.destroy()
       }
     }

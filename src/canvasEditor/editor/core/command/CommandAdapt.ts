@@ -1,5 +1,10 @@
 import { NBSP, WRAP, ZERO } from '../../dataset/constant/Common'
-import { EDITOR_ELEMENT_STYLE_ATTR } from '../../dataset/constant/Element'
+import {
+  EDITOR_ELEMENT_STYLE_ATTR,
+  EDITOR_ROW_ATTR,
+  LIST_CONTEXT_ATTR,
+  TABLE_CONTEXT_ATTR
+} from '../../dataset/constant/Element'
 import {
   titleOrderNumberMapping,
   titleSizeMapping
@@ -45,7 +50,8 @@ import {
   IEditorHTML,
   IEditorOption,
   IEditorResult,
-  IEditorText
+  IEditorText,
+  IUpdateOption
 } from '../../interface/Editor'
 import { IElement, IElementStyle } from '../../interface/Element'
 import { IPasteOption } from '../../interface/Event'
@@ -60,7 +66,13 @@ import {
   IGetTitleValueResult
 } from '../../interface/Title'
 import { IWatermark } from '../../interface/Watermark'
-import { deepClone, downloadFile, getUUID, isObjectEqual } from '../../utils'
+import {
+  cloneProperty,
+  deepClone,
+  downloadFile,
+  getUUID,
+  isObjectEqual
+} from '../../utils'
 import {
   createDomFromElementList,
   formatElementContext,
@@ -69,8 +81,10 @@ import {
   pickElementAttr,
   getElementListByHTML,
   getTextFromElementList,
-  zipElementList
+  zipElementList,
+  getAnchorElement
 } from '../../utils/element'
+import { mergeOption } from '../../utils/option'
 import { printImageBase64 } from '../../utils/print'
 import { Control } from '../draw/control/Control'
 import { Draw } from '../draw/Draw'
@@ -714,6 +728,7 @@ export class CommandAdapt {
       } else {
         if (el.titleId) {
           delete el.titleId
+          delete el.title
           delete el.level
           delete el.size
           delete el.bold
@@ -1794,14 +1809,15 @@ export class CommandAdapt {
     if (isDisabled) return
     const { startIndex, endIndex } = this.range.getRange()
     if (!~startIndex && !~endIndex) return
-    const { value, width, height } = payload
+    const { value, width, height, imgDisplay } = payload
     this.insertElementList([
       {
         value,
         width,
         height,
         id: getUUID(),
-        type: ElementType.IMAGE
+        type: ElementType.IMAGE,
+        imgDisplay
       }
     ])
   }
@@ -1993,12 +2009,12 @@ export class CommandAdapt {
   public changeImageDisplay(element: IElement, display: ImageDisplay) {
     if (element.imgDisplay === display) return
     element.imgDisplay = display
+    const { startIndex, endIndex } = this.range.getRange()
     if (
       display === ImageDisplay.FLOAT_TOP ||
       display === ImageDisplay.FLOAT_BOTTOM
     ) {
       const positionList = this.position.getPositionList()
-      const { startIndex } = this.range.getRange()
       const {
         coordinate: { leftTop }
       } = positionList[startIndex]
@@ -2011,7 +2027,8 @@ export class CommandAdapt {
     }
     this.draw.getPreviewer().clearResizer()
     this.draw.render({
-      isSetCursor: false
+      isSetCursor: true,
+      curIndex: endIndex
     })
   }
 
@@ -2134,8 +2151,17 @@ export class CommandAdapt {
     // 区域信息
     const zone = this.draw.getZone().getZone()
     // 表格信息
-    const isTable = this.position.getPositionContext().isTable
-    return deepClone({
+    const { isTable, trIndex, tdIndex, index } =
+      this.position.getPositionContext()
+    let tableElement: IElement | null = null
+    if (isTable) {
+      const originalElementList = this.draw.getOriginalElementList()
+      const originTableElement = originalElementList[index!] || null
+      if (originTableElement) {
+        tableElement = zipElementList([originTableElement])[0]
+      }
+    }
+    return deepClone<RangeContext>({
       isCollapsed,
       startElement,
       endElement,
@@ -2143,7 +2169,10 @@ export class CommandAdapt {
       endPageNo,
       rangeRects,
       zone,
-      isTable
+      isTable,
+      trIndex: trIndex ?? null,
+      tdIndex: tdIndex ?? null,
+      tableElement
     })
   }
 
@@ -2399,6 +2428,14 @@ export class CommandAdapt {
     this.draw.getControl().setHighlightList(payload)
   }
 
+  public updateOptions(payload: IUpdateOption) {
+    const newOption = mergeOption(payload)
+    Object.entries(newOption).forEach(([key, value]) => {
+      Reflect.set(this.options, key, value)
+    })
+    this.forceUpdate()
+  }
+
   public getControlList(): IElement[] {
     return this.draw.getControl().getList()
   }
@@ -2471,5 +2508,26 @@ export class CommandAdapt {
       getValue(elementList, zone)
     }
     return result
+  }
+
+  public insertTitle(payload: IElement) {
+    const isReadonly = this.draw.isReadonly()
+    if (isReadonly) return
+    const cloneElement = deepClone(payload)
+    // 格式化上下文信息
+    const { startIndex } = this.range.getRange()
+    const elementList = this.draw.getElementList()
+    const copyElement = getAnchorElement(elementList, startIndex)
+    if (!copyElement) return
+    const cloneAttr = [
+      ...TABLE_CONTEXT_ATTR,
+      ...EDITOR_ROW_ATTR,
+      ...LIST_CONTEXT_ATTR
+    ]
+    cloneElement.valueList?.forEach(valueItem => {
+      cloneProperty<IElement>(cloneAttr, copyElement, valueItem)
+    })
+    // 插入标题
+    this.draw.insertElementList([cloneElement])
   }
 }
