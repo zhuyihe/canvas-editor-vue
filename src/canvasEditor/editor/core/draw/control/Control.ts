@@ -40,7 +40,9 @@ import { ControlSearch } from './interactive/ControlSearch'
 import { ControlBorder } from './richtext/Border'
 import { SelectControl } from './select/SelectControl'
 import { TextControl } from './text/TextControl'
+import { DateControl } from './date/DateControl'
 import { MoveDirection } from '../../../dataset/enum/Observer'
+import { CONTROL_STYLE_ATTR } from '../../../dataset/constant/Element'
 
 interface IMoveCursorResult {
   newIndex: number
@@ -178,6 +180,23 @@ export class Control {
     return false
   }
 
+  // 是否元素包含完整控件元素
+  public getIsElementListContainFullControl(elementList: IElement[]): boolean {
+    if (!elementList.some(element => element.controlId)) return false
+    let prefixCount = 0
+    let postfixCount = 0
+    for (let e = 0; e < elementList.length; e++) {
+      const element = elementList[e]
+      if (element.controlComponent === ControlComponent.PREFIX) {
+        prefixCount++
+      } else if (element.controlComponent === ControlComponent.POSTFIX) {
+        postfixCount++
+      }
+    }
+    if (!prefixCount || !postfixCount) return false
+    return prefixCount === postfixCount
+  }
+
   public getIsDisabledControl(): boolean {
     return !!this.activeControl?.getElement().control?.disabled
   }
@@ -223,9 +242,16 @@ export class Control {
     const element = elementList[range.startIndex]
     // 判断控件是否已经激活
     if (this.activeControl) {
-      // 列举控件唤醒下拉弹窗
-      if (this.activeControl instanceof SelectControl) {
-        this.activeControl.awake()
+      // 弹窗类控件唤醒弹窗，后缀处移除弹窗
+      if (
+        this.activeControl instanceof SelectControl ||
+        this.activeControl instanceof DateControl
+      ) {
+        if (element.controlComponent === ControlComponent.POSTFIX) {
+          this.activeControl.destroy()
+        } else {
+          this.activeControl.awake()
+        }
       }
       const controlElement = this.activeControl.getElement()
       if (element.controlId === controlElement.controlId) return
@@ -244,6 +270,10 @@ export class Control {
       this.activeControl = new CheckboxControl(element, this)
     } else if (control.type === ControlType.RADIO) {
       this.activeControl = new RadioControl(element, this)
+    } else if (control.type === ControlType.DATE) {
+      const dateControl = new DateControl(element, this)
+      this.activeControl = dateControl
+      dateControl.awake()
     }
     // 激活控件回调
     nextTick(() => {
@@ -269,7 +299,10 @@ export class Control {
 
   public destroyControl() {
     if (this.activeControl) {
-      if (this.activeControl instanceof SelectControl) {
+      if (
+        this.activeControl instanceof SelectControl ||
+        this.activeControl instanceof DateControl
+      ) {
         this.activeControl.destroy()
       }
       this.activeControl = null
@@ -316,7 +349,8 @@ export class Control {
     const element = elementList[range.startIndex]
     this.activeControl.setElement(element)
     if (
-      this.activeControl instanceof SelectControl &&
+      (this.activeControl instanceof DateControl ||
+        this.activeControl instanceof SelectControl) &&
       this.activeControl.getIsPopup()
     ) {
       this.activeControl.destroy()
@@ -542,14 +576,14 @@ export class Control {
           const nextElement = elementList[j]
           if (nextElement.controlId !== element.controlId) break
           if (
-            type === ControlType.TEXT &&
+            (type === ControlType.TEXT || type === ControlType.DATE) &&
             nextElement.controlComponent === ControlComponent.VALUE
           ) {
             textControlValue += nextElement.value
           }
           j++
         }
-        if (type === ControlType.TEXT) {
+        if (type === ControlType.TEXT || type === ControlType.DATE) {
           result.push({
             ...element.control,
             zone,
@@ -674,6 +708,14 @@ export class Control {
           this.activeControl = radio
           const codes = value ? [value] : []
           radio.setSelect(codes, controlContext, controlRule)
+        } else if (type === ControlType.DATE) {
+          const date = new DateControl(element, this)
+          this.activeControl = date
+          if (value) {
+            date.setSelect(value, controlContext, controlRule)
+          } else {
+            date.clearSelect(controlContext, controlRule)
+          }
         }
         // 模拟控件激活后销毁
         this.activeControl = null
@@ -752,17 +794,21 @@ export class Control {
     if (isReadonly) return
     const { conceptId, properties } = payload
     let isExistUpdate = false
-    const pageComponentData: IEditorData = {
-      header: this.draw.getHeaderElementList(),
-      main: this.draw.getOriginalMainElementList(),
-      footer: this.draw.getFooterElementList()
-    }
-    for (const key in pageComponentData) {
-      const elementList = pageComponentData[<keyof IEditorData>key]!
+    function setProperties(elementList: IElement[]) {
       let i = 0
       while (i < elementList.length) {
         const element = elementList[i]
         i++
+        if (element.type === ElementType.TABLE) {
+          const trList = element.trList!
+          for (let r = 0; r < trList.length; r++) {
+            const tr = trList[r]
+            for (let d = 0; d < tr.tdList.length; d++) {
+              const td = tr.tdList[d]
+              setProperties(td.value)
+            }
+          }
+        }
         if (element?.control?.conceptId !== conceptId) continue
         isExistUpdate = true
         element.control = {
@@ -770,6 +816,13 @@ export class Control {
           ...properties,
           value: element.control.value
         }
+        // 控件默认样式
+        CONTROL_STYLE_ATTR.forEach(key => {
+          const controlStyleProperty = properties[key]
+          if (controlStyleProperty) {
+            Reflect.set(element, key, controlStyleProperty)
+          }
+        })
         // 修改后控件结束索引
         let newEndIndex = i
         while (newEndIndex < elementList.length) {
@@ -779,6 +832,16 @@ export class Control {
         }
         i = newEndIndex
       }
+    }
+    // 页眉页脚正文启动搜索
+    const pageComponentData: IEditorData = {
+      header: this.draw.getHeaderElementList(),
+      main: this.draw.getOriginalMainElementList(),
+      footer: this.draw.getFooterElementList()
+    }
+    for (const key in pageComponentData) {
+      const elementList = pageComponentData[<keyof IEditorData>key]!
+      setProperties(elementList)
     }
     if (!isExistUpdate) return
     // 强制更新
@@ -797,21 +860,37 @@ export class Control {
   }
 
   public getList(): IElement[] {
-    const data = [
-      this.draw.getHeader().getElementList(),
-      this.draw.getOriginalMainElementList(),
-      this.draw.getFooter().getElementList()
-    ]
     const controlElementList: IElement[] = []
-    for (const elementList of data) {
+    function getControlElementList(elementList: IElement[]) {
       for (let e = 0; e < elementList.length; e++) {
         const element = elementList[e]
+        if (element.type === ElementType.TABLE) {
+          const trList = element.trList!
+          for (let r = 0; r < trList.length; r++) {
+            const tr = trList[r]
+            for (let d = 0; d < tr.tdList.length; d++) {
+              const td = tr.tdList[d]
+              const tdElement = td.value
+              getControlElementList(tdElement)
+            }
+          }
+        }
         if (element.controlId) {
           controlElementList.push(element)
         }
       }
     }
-    return zipElementList(controlElementList)
+    const data = [
+      this.draw.getHeader().getElementList(),
+      this.draw.getOriginalMainElementList(),
+      this.draw.getFooter().getElementList()
+    ]
+    for (const elementList of data) {
+      getControlElementList(elementList)
+    }
+    return zipElementList(controlElementList, {
+      extraPickAttrs: ['controlId']
+    })
   }
 
   public recordBorderInfo(x: number, y: number, width: number, height: number) {

@@ -3,6 +3,7 @@ import {
   EditorMode,
   PageMode,
   PaperDirection,
+  RenderMode,
   WordBreak
 } from '../dataset/enum/Editor'
 import { IBackgroundOption } from './Background'
@@ -60,6 +61,7 @@ export interface IEditorOption {
   marginIndicatorColor?: string
   margins?: IMargin
   pageMode?: PageMode
+  renderMode?: RenderMode
   defaultHyperlinkColor?: string
   paperDirection?: PaperDirection
   inactiveAlpha?: number
@@ -91,11 +93,8 @@ export interface IEditorOption {
 
 export interface IEditorResult {
   version: string
-  width: number
-  height: number
-  margins: IMargin
-  watermark?: IWatermark
   data: IEditorData
+  options: IEditorOption
 }
 
 export interface IEditorHTML {
