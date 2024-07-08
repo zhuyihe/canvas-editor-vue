@@ -520,12 +520,22 @@ export function isSameElementExceptValue(
   }
   return true
 }
-
-export function pickElementAttr(payload: IElement): IElement {
+interface IPickElementOption {
+  extraPickAttrs?: Array<keyof IElement>
+}
+export function pickElementAttr(
+  payload: IElement,
+  option: IPickElementOption = {}
+): IElement {
+  const { extraPickAttrs } = option
+  const zipAttrs = EDITOR_ELEMENT_ZIP_ATTR
+  if (extraPickAttrs) {
+    zipAttrs.push(...extraPickAttrs)
+  }
   const element: IElement = {
     value: payload.value === ZERO ? `\n` : payload.value
   }
-  EDITOR_ELEMENT_ZIP_ATTR.forEach(attr => {
+  zipAttrs.forEach(attr => {
     const value = payload[attr] as never
     if (value !== undefined) {
       element[attr] = value
@@ -534,7 +544,14 @@ export function pickElementAttr(payload: IElement): IElement {
   return element
 }
 
-export function zipElementList(payload: IElement[]): IElement[] {
+interface IZipElementListOption {
+  extraPickAttrs?: Array<keyof IElement>
+}
+export function zipElementList(
+  payload: IElement[],
+  options: IZipElementListOption = {}
+): IElement[] {
+  const { extraPickAttrs } = options
   const elementList = deepClone(payload)
   const zipElementListData: IElement[] = []
   let e = 0
@@ -574,7 +591,7 @@ export function zipElementList(payload: IElement[]): IElement[] {
           valueList.push(titleE)
           e++
         }
-        titleElement.valueList = zipElementList(valueList)
+        titleElement.valueList = zipElementList(valueList, options)
         element = titleElement
       }
     } else if (element.listId && element.listType) {
@@ -602,7 +619,7 @@ export function zipElementList(payload: IElement[]): IElement[] {
           valueList.push(listE)
           e++
         }
-        listElement.valueList = zipElementList(valueList)
+        listElement.valueList = zipElementList(valueList, options)
         element = listElement
       }
     } else if (element.type === ElementType.TABLE) {
@@ -632,7 +649,7 @@ export function zipElementList(payload: IElement[]): IElement[] {
             const zipTd: ITd = {
               colspan: td.colspan,
               rowspan: td.rowspan,
-              value: zipElementList(td.value)
+              value: zipElementList(td.value, options)
             }
             // 压缩单元格属性
             TABLE_TD_ZIP_ATTR.forEach(attr => {
@@ -666,7 +683,7 @@ export function zipElementList(payload: IElement[]): IElement[] {
           valueList.push(hyperlinkE)
           e++
         }
-        hyperlinkElement.valueList = zipElementList(valueList)
+        hyperlinkElement.valueList = zipElementList(valueList, options)
         element = hyperlinkElement
       }
     } else if (element.type === ElementType.DATE) {
@@ -689,7 +706,7 @@ export function zipElementList(payload: IElement[]): IElement[] {
           valueList.push(dateE)
           e++
         }
-        dateElement.valueList = zipElementList(valueList)
+        dateElement.valueList = zipElementList(valueList, options)
         element = dateElement
       }
     } else if (element.controlId) {
@@ -708,7 +725,8 @@ export function zipElementList(payload: IElement[]): IElement[] {
           ...pickObject(element, EDITOR_ROW_ATTR),
           type: ElementType.CONTROL,
           value: '',
-          control
+          control,
+          controlId
         }
         const valueList: IElement[] = []
         while (e < elementList.length) {
@@ -724,12 +742,12 @@ export function zipElementList(payload: IElement[]): IElement[] {
           }
           e++
         }
-        controlElement.control!.value = zipElementList(valueList)
-        element = controlElement
+        controlElement.control!.value = zipElementList(valueList, options)
+        element = pickElementAttr(controlElement, { extraPickAttrs })
       }
     }
     // 组合元素
-    const pickElement = pickElementAttr(element)
+    const pickElement = pickElementAttr(element, { extraPickAttrs })
     if (
       !element.type ||
       element.type === ElementType.TEXT ||
@@ -741,7 +759,10 @@ export function zipElementList(payload: IElement[]): IElement[] {
         e++
         if (
           nextElement &&
-          isSameElementExceptValue(pickElement, pickElementAttr(nextElement))
+          isSameElementExceptValue(
+            pickElement,
+            pickElementAttr(nextElement, { extraPickAttrs })
+          )
         ) {
           const nextValue =
             nextElement.value === ZERO ? '\n' : nextElement.value
@@ -838,7 +859,7 @@ export function formatElementContext(
     if (
       isBreakWhenWrap &&
       !copyElement.listId &&
-      /^\n/.test(targetElement.value)
+      START_LINE_BREAK_REG.test(targetElement.value)
     ) {
       isBreakWarped = true
     }
@@ -1268,7 +1289,10 @@ export function getElementListByHTML(
           }
         } else if (/H[1-6]/.test(node.nodeName)) {
           const hElement = node as HTMLTitleElement
-          const valueList = getElementListByHTML(hElement.innerHTML, options)
+          const valueList = getElementListByHTML(
+            replaceHTMLElementTag(hElement, 'div').outerHTML,
+            options
+          )
           elementList.push({
             value: '',
             type: ElementType.TITLE,
@@ -1359,9 +1383,7 @@ export function getElementListByHTML(
               }
               tr.tdList.push(td)
             })
-            if (tr.tdList.length) {
-              element.trList!.push(tr)
-            }
+            element.trList!.push(tr)
           })
           if (element.trList!.length) {
             // 列选项数据
@@ -1510,4 +1532,17 @@ export function getIsBlockElement(element?: IElement) {
     (BLOCK_ELEMENT_TYPE.includes(element.type) ||
       element.imgDisplay === ImageDisplay.INLINE)
   )
+}
+
+export function replaceHTMLElementTag(
+  oldDom: HTMLElement,
+  tagName: keyof HTMLElementTagNameMap
+): HTMLElement {
+  const newDom = document.createElement(tagName)
+  for (let i = 0; i < oldDom.attributes.length; i++) {
+    const attr = oldDom.attributes[i]
+    newDom.setAttribute(attr.name, attr.value)
+  }
+  newDom.innerHTML = oldDom.innerHTML
+  return newDom
 }

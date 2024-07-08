@@ -3,6 +3,7 @@ import {
   EDITOR_ELEMENT_STYLE_ATTR,
   EDITOR_ROW_ATTR
 } from '../../../../dataset/constant/Element'
+import { ControlComponent } from '../../../../dataset/enum/Control'
 import { IElement } from '../../../../interface/Element'
 import {
   formatElementContext,
@@ -37,6 +38,10 @@ export function enter(evt: KeyboardEvent, host: CanvasEvent) {
   if (evt.shiftKey && startElement.listId) {
     enterText.listWrap = true
   }
+  // 格式化上下文
+  formatElementContext(elementList, [enterText], startIndex, {
+    isBreakWhenWrap: true
+  })
   // 标题结尾处回车无需格式化及样式复制
   if (
     !(
@@ -44,12 +49,14 @@ export function enter(evt: KeyboardEvent, host: CanvasEvent) {
       endElement.titleId !== elementList[endIndex + 1]?.titleId
     )
   ) {
-    // 格式化上下文
-    formatElementContext(elementList, [enterText], startIndex)
     // 复制样式属性
     const copyElement = getAnchorElement(elementList, endIndex)
     if (copyElement) {
-      const copyAttr = [...EDITOR_ELEMENT_STYLE_ATTR, ...EDITOR_ROW_ATTR]
+      const copyAttr = [...EDITOR_ROW_ATTR]
+      // 不复制控件后缀样式
+      if (copyElement.controlComponent !== ControlComponent.POSTFIX) {
+        copyAttr.push(...EDITOR_ELEMENT_STYLE_ATTR)
+      }
       copyAttr.forEach(attr => {
         const value = copyElement[attr] as never
         if (value !== undefined) {
