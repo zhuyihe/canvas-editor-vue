@@ -83,7 +83,7 @@ export type IControl = IControlBasic &
   Partial<IControlCheckbox> &
   Partial<IControlRadio> &
   Partial<IControlMutselect> &
-  Partial<IControlStyle>
+  Partial<IControlStyle> &
   Partial<IControlDate>
 
 export interface IControlOption {
