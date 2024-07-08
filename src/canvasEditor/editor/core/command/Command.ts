@@ -76,6 +76,7 @@ export class Command {
   public executeSetPaperMargin: CommandAdapt['setPaperMargin']
   public executeInsertElementList: CommandAdapt['insertElementList']
   public executeAppendElementList: CommandAdapt['appendElementList']
+  public executeUpdateElementById: CommandAdapt['updateElementById']
   public executeSetValue: CommandAdapt['setValue']
   public executeRemoveControl: CommandAdapt['removeControl']
   public executeSetLocale: CommandAdapt['setLocale']
@@ -90,6 +91,7 @@ export class Command {
   public executeSetControlExtension: CommandAdapt['setControlExtension']
   public executeSetControlProperties: CommandAdapt['setControlProperties']
   public executeSetControlHighlight: CommandAdapt['setControlHighlight']
+  public executeLocationControl: CommandAdapt['locationControl']
   public executeUpdateOptions: CommandAdapt['updateOptions']
   public executeInsertTitle: CommandAdapt['insertTitle']
   public getCatalog: CommandAdapt['getCatalog']
@@ -113,6 +115,7 @@ export class Command {
   public getControlList: CommandAdapt['getControlList']
   public getContainer: CommandAdapt['getContainer']
   public getTitleValue: CommandAdapt['getTitleValue']
+  public getPositionContextByEvent: CommandAdapt['getPositionContextByEvent']
 
   constructor(adapt: CommandAdapt) {
     // 全局命令
@@ -197,6 +200,7 @@ export class Command {
     // 通用
     this.executeInsertElementList = adapt.insertElementList.bind(adapt)
     this.executeAppendElementList = adapt.appendElementList.bind(adapt)
+    this.executeUpdateElementById = adapt.updateElementById.bind(adapt)
     this.executeSetValue = adapt.setValue.bind(adapt)
     this.executeRemoveControl = adapt.removeControl.bind(adapt)
     this.executeSetLocale = adapt.setLocale.bind(adapt)
@@ -229,6 +233,7 @@ export class Command {
     this.getGroupIds = adapt.getGroupIds.bind(adapt)
     this.getContainer = adapt.getContainer.bind(adapt)
     this.getTitleValue = adapt.getTitleValue.bind(adapt)
+    this.getPositionContextByEvent = adapt.getPositionContextByEvent.bind(adapt)
     // 控件
     this.executeSetControlValue = adapt.setControlValue.bind(adapt)
     this.executeSetControlExtension = adapt.setControlExtension.bind(adapt)
@@ -236,5 +241,6 @@ export class Command {
     this.executeSetControlHighlight = adapt.setControlHighlight.bind(adapt)
     this.getControlValue = adapt.getControlValue.bind(adapt)
     this.getControlList = adapt.getControlList.bind(adapt)
+    this.executeLocationControl = adapt.locationControl.bind(adapt)
   }
 }

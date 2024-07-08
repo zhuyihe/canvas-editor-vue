@@ -3,7 +3,8 @@ export enum ControlType {
   SELECT = 'select',
   MUTISELECT = 'mutiselect',
   CHECKBOX = 'checkbox',
-  RADIO = 'radio'
+  RADIO = 'radio',
+  DATE = 'date'
 }
 
 export enum ControlComponent {
