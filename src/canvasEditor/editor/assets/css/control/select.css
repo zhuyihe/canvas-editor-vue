@@ -43,7 +43,7 @@
   font-weight: 700;
 }
 /* 多选下拉容器样式，基于给出的.ce-select-control-popup的样式 */
-/* .ce-mutiselect-popup-container {
+/* .ce-multiselect-popup-container {
   max-width: 160px;
   min-width: 69px;
   max-height: 225px;
@@ -58,14 +58,14 @@
   overflow-y: auto;
 }
 
-.ce-mutiselect-popup-container ul {
+.ce-multiselect-popup-container ul {
   list-style: none;
   padding: 3px 0;
   margin: 0;
   box-sizing: border-box;
 }
 
-.ce-mutiselect-popup-container ul li {
+.ce-multiselect-popup-container ul li {
   font-size: 13px;
   padding: 0 20px;
   display: flex;
@@ -84,17 +84,17 @@
   }
 }
 
-.ce-mutiselect-popup-container ul li:hover {
+.ce-multiselect-popup-container ul li:hover {
   background-color: #EEF2FD;
 }
 
-.ce-mutiselect-popup-container ul li.active,
-.ce-mutiselect-popup-container ul li input[type='checkbox']:checked+label {
+.ce-multiselect-popup-container ul li.active,
+.ce-multiselect-popup-container ul li input[type='checkbox']:checked+label {
   color: var(--COLOR-HOVER, #5175f4);
   font-weight: 700;
 }
 
-.ce-mutiselect-popup-container input[type='checkbox'] {
+.ce-multiselect-popup-container input[type='checkbox'] {
   -webkit-appearance: none;
   appearance: none;
   background: #f0f0f0;
@@ -105,7 +105,7 @@
   position: relative;
 }
 
-.ce-mutiselect-popup-container input[type='checkbox']:checked::before {
+.ce-multiselect-popup-container input[type='checkbox']:checked::before {
   content: '✔';
   position: absolute;
   top: -3px;
@@ -113,12 +113,12 @@
   color: #099;
 }
 
-.ce-mutiselect-popup-container input[type='checkbox']:focus {
+.ce-multiselect-popup-container input[type='checkbox']:focus {
   outline: none;
 }
 
 
-.ce-mutiselect-popup-container label {
+.ce-multiselect-popup-container label {
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -126,7 +126,7 @@
   margin-left: 7px; 
 } */
 /* 弹出菜单容器 */
-.ce-mutiselect-popup-container {
+.ce-multiselect-popup-container {
   position: absolute;
   z-index: 1000;
   width: 280px;
@@ -151,10 +151,10 @@
   }
 }
 
-.ce-mutiselect-popup-search {
+.ce-multiselect-popup-search {
   padding:10px;
 }
-.ce-mutiselect-popup-search input {
+.ce-multiselect-popup-search input {
   -webkit-appearance: none;
   background-color: #fff;
   background-image: none;
@@ -171,18 +171,18 @@
   transition: border-color .2s cubic-bezier(.645,.045,.355,1);
   width: 100%;
 }
-.ce-mutiselect-popup-search input:focus {
+.ce-multiselect-popup-search input:focus {
   border-color: #409eff;
 }
 
-.ce-mutiselect-popup-container ul {
+.ce-multiselect-popup-container ul {
   list-style: none;
   padding: 6px 0;
   margin: 0;
   box-sizing: border-box;
 }
 
-.ce-mutiselect-popup-container li {
+.ce-multiselect-popup-container li {
   font-size: 14px;
   padding: 0 20px;
   position: relative;
@@ -199,15 +199,15 @@
 }
 
 
-.ce-mutiselect-popup-container li.selected{
+.ce-multiselect-popup-container li.selected{
   color: #409eff;
   background-color: #fff;
 }
-.ce-mutiselect-popup-container li:hover {
+.ce-multiselect-popup-container li:hover {
   background-color: #f7f7f7;
 }
 /* 选中项对勾的样式 */
-.ce-mutiselect-popup-container li.selected:after {
+.ce-multiselect-popup-container li.selected:after {
   content: '✔';
   font-size: 16px;
   position: absolute;

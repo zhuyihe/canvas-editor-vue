@@ -40,7 +40,7 @@ import { ControlSearch } from './interactive/ControlSearch'
 import { ControlBorder } from './richtext/Border'
 import { SelectControl } from './select/SelectControl'
 import { TextControl } from './text/TextControl'
-import { MutiselectControl } from './muselect/MutiselectControl'
+import { MultiselectControl } from './muselect/MultiselectControl'
 import { DateControl } from './date/DateControl'
 import { MoveDirection } from '../../../dataset/enum/Observer'
 import { CONTROL_STYLE_ATTR } from '../../../dataset/constant/Element'
@@ -247,7 +247,8 @@ export class Control {
       // 弹窗类控件唤醒弹窗，后缀处移除弹窗
       if (
         this.activeControl instanceof SelectControl ||
-        this.activeControl instanceof DateControl
+        this.activeControl instanceof DateControl ||
+        this.activeControl instanceof MultiselectControl
       ) {
         if (element.controlComponent === ControlComponent.POSTFIX) {
           this.activeControl.destroy()
@@ -255,9 +256,7 @@ export class Control {
           this.activeControl.awake()
         }
       }
-      if (this.activeControl instanceof MutiselectControl) {
-        this.activeControl.awake()
-      }
+      
       const controlElement = this.activeControl.getElement()
       if (element.controlId === controlElement.controlId) return
     }
@@ -276,7 +275,7 @@ export class Control {
     } else if (control.type === ControlType.RADIO) {
       this.activeControl = new RadioControl(element, this)
     } else if (control.type === ControlType.MUTISELECT) {
-      const selectControl = new MutiselectControl(element, this)
+      const selectControl = new MultiselectControl(element, this)
       this.activeControl = selectControl
       selectControl.awake()
     } else if (control.type === ControlType.DATE) {
@@ -314,7 +313,7 @@ export class Control {
       ) {
         this.activeControl.destroy()
       }
-      if (this.activeControl instanceof MutiselectControl) {
+      if (this.activeControl instanceof MultiselectControl) {
         this.activeControl.destroy()
       }
       this.activeControl = null
@@ -362,14 +361,8 @@ export class Control {
     this.activeControl.setElement(element)
     if (
       (this.activeControl instanceof DateControl ||
-        this.activeControl instanceof SelectControl) &&
-      this.activeControl.getIsPopup()
-    ) {
-      this.activeControl.destroy()
-      this.activeControl.awake()
-    }
-    if (
-      this.activeControl instanceof MutiselectControl &&
+        this.activeControl instanceof SelectControl||
+        this.activeControl instanceof MultiselectControl) &&
       this.activeControl.getIsPopup()
     ) {
       this.activeControl.destroy()
@@ -729,8 +722,9 @@ export class Control {
           const codes = value ? [value] : []
           radio.setSelect(codes, controlContext, controlRule)
         }else if (type === ControlType.MUTISELECT) {
-          const select = new MutiselectControl(element, this)
+          const select = new MultiselectControl(element, this)
           const codes = value?.split(',') || []
+          console.log(codes,'codes')
           select.setSelect(codes, controlContext, controlRule)
         } else if (type === ControlType.DATE) {
           const date = new DateControl(element, this)

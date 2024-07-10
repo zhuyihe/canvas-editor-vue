@@ -2253,7 +2253,6 @@ export class Draw {
   }
 
   public render(payload?: IDrawOption) {
-    console.log(payload,'payload')
     const { header, footer } = this.options
     const {
       isSubmitHistory = true,
@@ -2425,14 +2424,12 @@ export class Draw {
     const pageNo = this.pageNo
     const oldPositionContext = deepClone(positionContext)
     const zone = this.zone.getZone()
-    console.log(curIndex,'submitHistory')
     this.historyManager.execute(() => {
       this.zone.setZone(zone)
       this.setPageNo(pageNo)
       this.position.setPositionContext(deepClone(oldPositionContext))
       this.header.setElementList(deepClone(oldHeaderElementList))
       this.footer.setElementList(deepClone(oldFooterElementList))
-      console.log(oldElementList,'oldElementList')
       this.elementList = deepClone(oldElementList)
       this.range.replaceRange(deepClone(oldRange))
       this.render({

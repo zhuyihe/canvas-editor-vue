@@ -17,12 +17,12 @@ import {
   IControlRuleOption
 } from '../../../../interface/Control'
 import { IElement } from '../../../../interface/Element'
-import { ValueListOption } from '../../../../interface/MutiSelect'
+import { ValueListOption } from '../../../../interface/Multiselect'
 import { omitObject, pickObject, splitText } from '../../../../utils'
 import { formatElementContext } from '../../../../utils/element'
 import { Control } from '../Control'
 
-export class MutiselectControl implements IControlInstance {
+export class MultiselectControl implements IControlInstance {
   private element: IElement
   private control: Control
   private isPopup: boolean
@@ -253,7 +253,7 @@ export class MutiselectControl implements IControlInstance {
 
     const { selectCodes } = this.getSelectCodes(context, leftIndex)
     const oldCode = this.element.control!.code || ''
-    
+
     this.setSelect(selectCodes) // 更新选项
     const cursorIndex = this.getCurentIndex(selectCodes, oldCode, leftIndex)
     return cursorIndex
@@ -396,7 +396,7 @@ export class MutiselectControl implements IControlInstance {
   public setSelect(
     codes: string[],
     context: IControlContext = {},
-    options: IControlRuleOption = {},
+    options: IControlRuleOption = {}
   ) {
     // 校验是否可以设置
     if (!options.isIgnoreDisabledRule && this.control.getIsDisabledControl()) {
@@ -483,7 +483,7 @@ export class MutiselectControl implements IControlInstance {
       console.log(context.range, context)
       // 重新渲染控件
       if (!context.range) {
-        const newIndex =start + data.length - 1
+        const newIndex = start + data.length - 1
         this.control.repaintControl({
           curIndex: newIndex
         })
@@ -502,7 +502,7 @@ export class MutiselectControl implements IControlInstance {
 
     const selectPopupContainer = document.createElement('div')
     selectPopupContainer.classList.add(
-      `${EDITOR_PREFIX}-mutiselect-popup-container`
+      `${EDITOR_PREFIX}-multiselect-popup-container`
     )
     selectPopupContainer.setAttribute(EDITOR_COMPONENT, EditorComponent.POPUP)
     const ul = document.createElement('ul')
@@ -510,7 +510,7 @@ export class MutiselectControl implements IControlInstance {
     const searchInput = document.createElement('input')
     searchInput.type = 'text'
     searchInput.placeholder = '搜索...'
-    div.classList.add(`${EDITOR_PREFIX}-mutiselect-popup-search`)
+    div.classList.add(`${EDITOR_PREFIX}-multiselect-popup-search`)
 
     div.appendChild(searchInput)
 
@@ -572,6 +572,7 @@ export class MutiselectControl implements IControlInstance {
     const container = this.control.getContainer()
     container.appendChild(selectPopupContainer)
     this.selectDom = selectPopupContainer
+    
   }
 
   public awake() {

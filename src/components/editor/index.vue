@@ -28,7 +28,11 @@ export default {
         maskMargin: [110, 0, 30, 0], // 菜单栏高度60，底部工具栏30为遮盖层
         tdPadding: [0, 5, 0, 5],
         defaultFont: '宋体',
-        defaultTrMinHeight: 24, // 最小行高
+        table:{
+          tdPadding: [0, 5, 0, 5],
+          defaultTrMinHeight: 26 , // 最小行高
+        },
+        
         control: {
           prefix: '[',
           postfix: ']',
